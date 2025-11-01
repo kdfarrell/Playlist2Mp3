@@ -1,6 +1,7 @@
 from yt_dlp import YoutubeDL
 from pathlib import Path
 import sys
+import re
 
 # -----------------------------
 # Setup downloads folder
@@ -20,14 +21,14 @@ if not ffmpeg_exe.exists() or not ffprobe_exe.exists():
     print("Please make sure 'ffmpeg.exe' and 'ffprobe.exe' are in the bin folder at the project root.")
     sys.exit(1)
 
-# -----------------------------
-# Ask user for URL
-# -----------------------------
+
 url = input("Please enter a YouTube video or playlist URL: ")
 
-# -----------------------------
-# Step 1: Extract metadata only
-# -----------------------------
+def sanitize_filename(name):
+    return re.sub(r'[\\/*?:"<>|]', "", name)
+
+
+# Extract metadata only
 ydl_opts_metadata = {
     'quiet': True,
     'no_warnings': True,
@@ -45,6 +46,10 @@ try:
         valid_videos = 0
         skipped_videos = 0
 
+        playlist_title = sanitize_filename(info.get('title', 'Untitled Playlist'))
+        playlist_folder = DOWNLOADS_DIR / playlist_title
+        playlist_folder.mkdir(exist_ok=True)
+
         print(f"\n✅ This is a playlist with {len(info['entries'])} items.\n")
 
         for entry in info['entries']:
@@ -60,25 +65,28 @@ try:
         if skipped_videos > 0:
             print(f"⚠️ Skipped {skipped_videos} unavailable/private videos.")
 
+        download_folder = playlist_folder
+
     else:
-        # Single video
         print("🎬 This is a single video.")
         title = info.get('title', 'Untitled')
         print(f"Title: {title}")
         playlist_entries = [url]
+
+        single_folder = DOWNLOADS_DIR / "Single Videos"
+        single_folder.mkdir(exist_ok=True)
+        download_folder = single_folder
 
 except Exception as e:
     print("❌ Invalid URL or video not available.")
     print("Error details:", e)
     sys.exit(1)
 
-# -----------------------------
 # Step 2: Download Audio
-# -----------------------------
 ydl_opts_download = {
     'format': 'bestaudio/best',
     'ignoreerrors': True,
-    'outtmpl': str(DOWNLOADS_DIR / '%(title)s.%(ext)s'),
+    'outtmpl': str(download_folder / '%(title)s.%(ext)s'),
     'quiet': True,
     'noprogress': True,
     'no_warnings': True,
@@ -90,7 +98,6 @@ ydl_opts_download = {
     }],
 }
 
-# Perform downloads with progress info
 with YoutubeDL(ydl_opts_download) as ydl:
     total_videos = len(playlist_entries)
     for idx, video_url in enumerate(playlist_entries, start=1):

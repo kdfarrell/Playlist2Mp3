@@ -1,11 +1,24 @@
 from yt_dlp import YoutubeDL
 from pathlib import Path
+import sys
 
 # -----------------------------
 # Setup downloads folder
 # -----------------------------
 DOWNLOADS_DIR = Path(__file__).parent / "downloads"
 DOWNLOADS_DIR.mkdir(exist_ok=True)
+
+# -----------------------------
+# Check for ffmpeg binaries
+# -----------------------------
+FFMPEG_DIR = Path(__file__).parent / "bin"
+ffmpeg_exe = FFMPEG_DIR / "ffmpeg.exe"
+ffprobe_exe = FFMPEG_DIR / "ffprobe.exe"
+
+if not ffmpeg_exe.exists() or not ffprobe_exe.exists():
+    print("❌ ffmpeg or ffprobe not found in 'bin/' folder!")
+    print("Please make sure 'ffmpeg.exe' and 'ffprobe.exe' are in the bin folder at the project root.")
+    sys.exit(1)
 
 # -----------------------------
 # Ask user for URL
@@ -28,20 +41,20 @@ try:
 
     # Determine if playlist or single video
     if 'entries' in info:
-        print(f"\n✅ This is a playlist with {len(info['entries'])} items.\n")
         playlist_entries = []
-
         valid_videos = 0
         skipped_videos = 0
 
-        for i, entry in enumerate(info['entries'], start=1):
+        print(f"\n✅ This is a playlist with {len(info['entries'])} items.\n")
+
+        for entry in info['entries']:
             title = entry.get('title', 'Untitled')
             if title in ["[Private video]", "[Deleted video]"]:
                 skipped_videos += 1
                 continue
-            print(f"{i - skipped_videos}. 🎵 {title}")
             playlist_entries.append(entry['url'])
             valid_videos += 1
+            print(f"{valid_videos}. 🎵 {title}")
 
         print(f"\n✅ Found {valid_videos} valid videos.")
         if skipped_videos > 0:
@@ -57,12 +70,11 @@ try:
 except Exception as e:
     print("❌ Invalid URL or video not available.")
     print("Error details:", e)
-    exit(1)
+    sys.exit(1)
 
 # -----------------------------
-# Step 2: Download URL
+# Step 2: Download Audio
 # -----------------------------
-
 ydl_opts_download = {
     'format': 'bestaudio/best',
     'ignoreerrors': True,
@@ -70,12 +82,20 @@ ydl_opts_download = {
     'quiet': True,
     'noprogress': True,
     'no_warnings': True,
+    'ffmpeg_location': str(FFMPEG_DIR),
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'mp3',
+        'preferredquality': '192',
+    }],
 }
 
-# Perform downloads
+# Perform downloads with progress info
 with YoutubeDL(ydl_opts_download) as ydl:
-    for video_url in playlist_entries:
+    total_videos = len(playlist_entries)
+    for idx, video_url in enumerate(playlist_entries, start=1):
         try:
+            print(f"\n⬇️ Downloading video {idx} of {total_videos}...")
             ydl.download([video_url])
         except Exception as e:
             print(f"\n❌ Failed to download {video_url}: {e}")

@@ -22,27 +22,28 @@ def fetch_info():
     url = request.args.get("url")
 
     if not is_valid_url(url):
-        return "Provide a valid url.", 400
+        return "Provide a valid url. /fetch_info route 400", 400
     
     try:
         video_info = fetch_video_info(url)
         return render_template("index.html", video_info=video_info)
     except Exception as e:
-        return f"Error: {str(e)}", 500
+        return f"Error fetching video info: {str(e)}", 500
 
 
 @app.route("/download")
 def download():
     url = request.args.get("url")
+    video_type = request.args.get("video_type")
     
     if not url:
         return "No url provided.", 404
 
     try:
-        title = download_audio(url)
+        title = download_audio(url, video_type)
         return f"Downloaded: {title}"
     except Exception as e:
-        return f"Error: {str(e)}", 500
+        return f"Error: /download 500", 500
 
 if __name__ == "__main__":
     app.run(debug=True)

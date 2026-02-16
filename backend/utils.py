@@ -3,12 +3,19 @@ from urllib.parse import urlparse
 class SilentLogger:
     def debug(self, msg):
         pass
+
     def warning(self, msg):
-        if "No supported JavaScript runtime" not in msg:
+        ignore_phrases = [
+            "No supported JavaScript runtime",
+            "ffmpeg not found",
+            "unavailable videos are hidden"
+        ]
+        if not any(phrase in msg for phrase in ignore_phrases):
             print(msg)
+
     def error(self, msg):
-        pass
-    
+        print(msg)  
+
 
 def is_valid_url(url):
     parsed = urlparse(url)

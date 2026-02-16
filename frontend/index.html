@@ -6,9 +6,31 @@
 </head>
 <body>
     <h1>Download YouTube Video as MP3</h1>
-    <form action="/convert" method="get">
+    <form action="/fetch_info" method="GET">
         <input type="text" name="url" placeholder="Enter YouTube URL" required>
-        <button type="submit">Download</button>
+        <button type="submit">Convert</button>
     </form>
+
+    {% if video_info %}
+        {% if video_info.type == "playlist" %}
+            <h1>{{ video_info.title }}</h1>
+            {% for video in video_info.videos %}
+                <h2>{{ video.title }}</h2>
+                <img src="{{ video.thumbnail }}" alt="Thumbnail of video" height="100px" width="100px">
+                <p>Uploader: {{ video.uploader }}</p>
+                <p>Duration: {{ video.duration }}</p>
+                <p>URL: {{ video.url }}</p>
+            {% endfor %}
+            <a href="{{ url_for('download', url=video_info.url, video_type=video_info.type) }}" class="btn">Download All</a>
+        {% elif video_info.type == "video" %}
+            <h2>{{ video_info.title }}</h2>
+            <img src="{{ video_info.thumbnail }}" alt="Thumbnail of video" height="100px" width="100px">
+            <p>Uploader: {{ video_info.uploader }}</p>
+            <p>Duration: {{ video_info.duration }}</p>
+            <p>{{ video_info.type }}</p>
+            <a href="{{ url_for('download', url=video_info.url, video_type=video_info.type) }}" class="btn">Download</a>
+        {% endif %}
+    {% endif %}
+
 </body>
 </html>

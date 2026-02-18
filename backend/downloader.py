@@ -5,13 +5,12 @@ import os
 
 def fetch_video_info(video_url):
     ydl_opts = {
-    "quiet": True,
-    "skip_download": True,
-    "ignoreerrors": True,
-    "logger": SilentLogger(),
-    "noplaylist": False,
-    "js_runtimes": { "deno": {} },
-}
+        "quiet": True,
+        "skip_download": True,
+        "ignoreerrors": True,
+        "logger": SilentLogger(),
+        "noplaylist": False,
+    }
 
     with YoutubeDL(ydl_opts) as ydl:
         video_info = ydl.extract_info(video_url, download=False)
@@ -45,6 +44,9 @@ def fetch_video_info(video_url):
 
 
 def download_audio(video_url, video_type):
+
+    FFMPEG_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ffmpeg", "ffmpeg.exe"))
+
     if video_type == "video":
         ydl_opts = {
             "format": "bestaudio/best",
@@ -56,8 +58,8 @@ def download_audio(video_url, video_type):
             }],
             "ignoreerrors": True, 
             "logger": SilentLogger(),
-            "ffmpeg_location": os.path.join(os.path.dirname(__file__), "ffmpeg", "ffmpeg.exe"),
-            "js_runtimes": { "deno": {} },
+            "ffmpeg_location": FFMPEG_PATH,
+            "quiet": True,
         }
 
         with YoutubeDL(ydl_opts) as ydl:
@@ -66,7 +68,7 @@ def download_audio(video_url, video_type):
         return f"{video_info.get('title')}.mp3"
     
     elif video_type == "playlist":
-        with YoutubeDL({"quiet": True, "ignoreerrors": True}) as ydl:
+        with YoutubeDL({"quiet": True, "ignoreerrors": True,  "logger": SilentLogger(),}) as ydl:
             video_info = ydl.extract_info(video_url, download=False)
 
         playlist_title = video_info.get("title", "playlist")
@@ -83,7 +85,7 @@ def download_audio(video_url, video_type):
             }],
             "ignoreerrors": True,
             "logger": SilentLogger(),
-            "ffmpeg_location": os.path.join(os.path.dirname(os.getcwd()), "ffmpeg", "ffmpeg.exe"),
+            "ffmpeg_location": FFMPEG_PATH,
         }
 
         with YoutubeDL(ydl_opts) as ydl:

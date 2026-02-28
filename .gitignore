@@ -1,4 +1,4 @@
 venv/
-!downloads/.gitkeep
-downloads/*/
+downloads/*
+downloads/.gitkeep
 __pycache__*

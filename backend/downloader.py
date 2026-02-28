@@ -2,7 +2,6 @@ from yt_dlp import YoutubeDL
 from utils import SilentLogger
 import os
 
-
 def fetch_video_info(video_url):
     ydl_opts = {
         "quiet": True,
@@ -43,14 +42,18 @@ def fetch_video_info(video_url):
             }
 
 
+
 def download_audio(video_url, video_type):
 
-    FFMPEG_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ffmpeg", "ffmpeg.exe"))
+    # Project root and downloads path
+    PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    DOWNLOADS_PATH = os.path.join(PROJECT_ROOT, "downloads")
+    FFMPEG_PATH = os.path.join(PROJECT_ROOT, "ffmpeg", "ffmpeg.exe")
 
     if video_type == "video":
         ydl_opts = {
             "format": "bestaudio/best",
-            "outtmpl": "downloads/%(title)s.%(ext)s",
+            "outtmpl": os.path.join(DOWNLOADS_PATH, "%(title)s.%(ext)s"),
             "postprocessors": [{
                 "key": "FFmpegExtractAudio",
                 "preferredcodec": "mp3",
@@ -65,14 +68,14 @@ def download_audio(video_url, video_type):
         with YoutubeDL(ydl_opts) as ydl:
             video_info = ydl.extract_info(video_url, download=True)
 
-        return f"{video_info.get('title')}.mp3"
+        return os.path.join(DOWNLOADS_PATH, f"{video_info.get('title')}.mp3")
     
     elif video_type == "playlist":
-        with YoutubeDL({"quiet": True, "ignoreerrors": True,  "logger": SilentLogger(),}) as ydl:
+        with YoutubeDL({"quiet": True, "ignoreerrors": True, "logger": SilentLogger()}) as ydl:
             video_info = ydl.extract_info(video_url, download=False)
 
         playlist_title = video_info.get("title", "playlist")
-        playlist_folder = os.path.join("downloads", playlist_title)
+        playlist_folder = os.path.join(DOWNLOADS_PATH, playlist_title)
         os.makedirs(playlist_folder, exist_ok=True)
 
         ydl_opts = {

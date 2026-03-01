@@ -1,0 +1,133 @@
+:root {
+    
+    /* Nav Bar Page Links */
+    --link-clr-normal: hsl(30 8% 50%);
+    --link-clr-hover: hsl(30 10% 12%);
+    --link-clr-hover-bg: hsl(35 30% 94%);
+
+    /* Nav Bar Page Link Active Page */
+    --clr-primary: rgb(234, 74, 62); 
+    --clr-primary-bg: hsl(4 80% 58% / .1);
+
+    
+    --text-primary: #231e1b;
+    --text-secondary: #8f8782;
+
+    --fs-normal: 1rem;
+    --fs-med: 1.25rem;
+    --fs-large: 1.5rem;
+    --f2-xl: 2rem;
+
+    --fw-regular: 400;
+    --fw-medium: 500;
+    --fw-semi-bold: 600;
+    --fw-bold: 700;
+    --fw-extra-bold: 800;
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+img, span {
+    display: block;
+}
+
+a {
+    text-decoration: none; 
+    color: inherit;   
+}
+
+ul, li {
+    list-style: none;
+}
+
+body {
+    font-family: "Poppins", sans-serif;
+}
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 0 1rem;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+
+/* Navigation Bar */
+
+header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 0;
+}
+
+.logo-container a {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo-container img {
+    width: 40px;
+    height: auto;
+    border-radius: .75rem;
+}
+
+.logo-text {
+    font-size: var(--fs-large);
+    font-weight: var(--fw-semi-bold);
+    color: var(--text-primary);
+}
+
+/* Hyperlinks */
+
+.nav ul {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.nav a {
+    font-weight: var(--fw-medium);
+    color: var(--text-secondary);
+    padding: .25rem .75rem;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.nav a:hover {
+    color: var(--link-clr-hover);
+    background-color: var(--link-clr-hover-bg);
+}
+
+/* Main */
+
+main {
+    flex-grow: 1;
+}
+
+/* Footer */
+
+footer {
+    padding: 1.5rem 0;
+}
+
+footer p {
+    font-weight: var(--fw-medium);
+    color: var(--link-clr-normal);
+}
+
+footer a {
+    color: var(--clr-primary);
+    font-weight: var(--fw-semi-bold);
+}

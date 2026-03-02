@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Playlist2Mp3 | How It Works{% endblock %}
+
+{% block head_extra%}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/how_it_works.css') }}">
+{% endblock %}
+
+
+{% block content %} 
+<section class="how-hero">
+    <h1>How it <span>Works</span></h1>
+    <p>Four simple steps to convert any YouTube content to MP3.</p>
+</section>
+
+<section class="steps-container">
+    <div class="step">
+        <div class="img-container">
+            <img src="{{ url_for('static', filename='images/link-icon.svg') }}" alt="Link icon">
+        </div>
+        <div class="step-info">
+            <span class="step-label">Step 1</span>
+            <h2>Paste the URL</h2>
+            <p>Copy any YouTube video or playlist link and paste it into the input field on our homepage.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="img-container">
+            <img src="{{ url_for('static', filename='images/search-icon.svg') }}" alt="Search icon">
+        </div>
+        <div class="step-info">
+            <span class="step-label">Step 2</span>
+            <h2>We fetch the info</h2>
+            <p>Our system retrieves the video metadata — title, thumbnail, uploader, and duration — in seconds.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="img-container">
+            <img src="{{ url_for('static', filename='images/download-icon.svg') }}" alt="Download icon">
+        </div>
+        <div class="step-info">
+            <span class="step-label">Step 3</span>
+            <h2>Convert & download</h2>
+            <p>Hit the download button and get a high-quality MP3 file delivered straight to your device.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="img-container">
+            <img src="{{ url_for('static', filename='images/headphone-icon.svg') }}" alt="Headphone icon">
+        </div>
+        <div class="step-info">
+            <span class="step-label">Step 4</span>
+            <h2>Enjoy offline</h2>
+            <p>Listen to your favorite tracks anytime, anywhere — no internet connection needed.</p>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+
+{% block title %}Playlist2Mp3 | About{% endblock %}
+
+
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
+{% endblock %}
+
+
+{% block content %}
+<!-- Hero Section -->
+            <section class="abt-hero" aria-labelledby="hero-heading">
+                <header class="hero-header">
+                    <div class="our-story">
+                        <img src="{{ url_for('static', filename='images/heart-icon.svg') }}" alt="Heart Icon">
+                        <p>Our Story</p>
+                    </div>
+                    <h1 id="hero-heading">About <span class="name">Playlist2Mp3</span></h1>
+                </header>
+                <p>We believe everyone deserves easy, free access to their favorite audio content — offline and on
+                    the go.</p>
+            </section>
+
+            <!-- Mission Section -->
+            <section class="abt-mission" aria-labelledby="mission-heading">
+                <header class="mission-header">
+                    <img src="{{ url_for('static', filename='images/music-icon.svg') }}" class="icon" alt="Music icon representing our mission">
+                    <h2 id="mission-heading">Our Mission</h2>
+                </header>
+                <p>
+                    Playlist2Mp3 was born from a simple frustration: wanting to listen to YouTube audio offline
+                    without jumping through hoops. We set out to build the simplest, fastest, and most
+                    privacy-respecting converter on the web.
+                </p>
+                <p>
+                    No ads cluttering your screen, no shady downloads, no personal data collected. Just paste,
+                    convert, and enjoy — the way it should be.
+                </p>
+            </section>
+
+            <!-- Why Us Section -->
+            <section class="abt-why-us" aria-labelledby="why-us-heading">
+                <h2 id="why-us-heading">Why choose Playlist2Mp3?</h2>
+                <div class="reasons">
+                    <div class="card">
+                        <img src="{{ url_for('static', filename='images/fast-icon.svg') }}" class="icon" alt="Fast conversion icon">
+                        <h3>Blazing Fast</h3>
+                        <p>Conversions happen in seconds, not minutes.</p>
+                    </div>
+
+                    <div class="card">
+                        <img src="{{ url_for('static', filename='images/shield-icon.svg') }}" class="icon" alt="No sign-up required icon">
+                        <h3>No Sign-up Required</h3>
+                        <p>Start converting immediately — zero barriers.</p>
+                    </div>
+
+                    <div class="card">
+                        <img src="{{ url_for('static', filename='images/lock-icon.svg') }}" class="icon" alt="Privacy first icon">
+                        <h3>Privacy First</h3>
+                        <p>We never store your files or personal data.</p>
+                    </div>
+
+                    <div class="card">
+                        <img src="{{ url_for('static', filename='images/globe-icon.svg') }}" class="icon" alt="Works everywhere icon">
+                        <h3>Works Everywhere</h3>
+                        <p>Any device, any browser, any time.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Privacy Section -->
+            <section class="abt-privacy" aria-labelledby="privacy-heading">
+                <header class="privacy-header">
+                    <img src="{{ url_for('static', filename='images/shield-icon.svg') }}" class="icon" alt="Privacy shield icon">
+                    <h2 id="privacy-heading">Your Privacy Matters</h2>
+                </header>
+                <ul>
+                    <li>We do not store any converted files on our servers.</li>
+                    <li>No personal data or browsing activity is collected.</li>
+                    <li>No cookies are used for tracking purposes.</li>
+                    <li>All processing is done in real-time and discarded immediately.</li>
+                </ul>
+            </section>
+{% endblock %}

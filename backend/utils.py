@@ -1,4 +1,5 @@
 from urllib.parse import urlparse
+import re
 
 class SilentLogger:
     def debug(self, msg):
@@ -39,6 +40,10 @@ def is_valid_url(url):
             return False
 
     return True
+
+
+def safe_filename(name):
+    return re.sub(r'[\\/*?:"<>|]', "", name)
 
 
     

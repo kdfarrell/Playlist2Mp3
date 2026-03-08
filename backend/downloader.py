@@ -1,6 +1,7 @@
 from yt_dlp import YoutubeDL
 from utils import SilentLogger, safe_filename
 import os
+from urllib.parse import urlparse
 
 
 # ---------------------------
@@ -23,35 +24,62 @@ def fetch_video_info(video_url):
         "ignoreerrors": True,
         "logger": SilentLogger(),
         "noplaylist": False,
+        "extract_flat": False,      # fetch full metadata
+        "no_warnings": True,
     }
 
-    with YoutubeDL(ydl_opts) as ydl:
-        video_info = ydl.extract_info(video_url, download=False)
+    try:
+        with YoutubeDL(ydl_opts) as ydl:
+            video_info = ydl.extract_info(video_url, download=False)
+    except Exception:
+        return {"error": "Failed to extract video information"}
 
-    if "entries" in video_info:
-        entries = video_info.get("entries")
+    if not video_info:
+        return {"error": "No video information found"}
+
+    entries = video_info.get("entries")
+
+    # Playlist
+    if entries:
+        videos = []
+        for entry in entries:
+            if not entry:
+                continue
+
+            # Skip deleted/private/unlisted videos
+            if entry.get("availability") != "public":
+                continue
+
+            entry_url = entry.get("webpage_url")
+            if not entry_url:
+                continue
+
+            videos.append({
+                "url": entry_url,
+                "title": entry.get("title"),
+                "thumbnail": entry.get("thumbnail"),
+                "duration": entry.get("duration"),
+                "uploader": entry.get("uploader"),
+            })
 
         return {
             "type": "playlist",
             "title": video_info.get("title"),
             "url": video_info.get("webpage_url"),
-            "videos": [
-                {
-                    "url": entry.get("webpage_url"),
-                    "title": entry.get("title"),
-                    "thumbnail": entry.get("thumbnail"),
-                    "duration": entry.get("duration"),
-                    "uploader": entry.get("uploader"),
-                }
-                for entry in entries if entry
-            ],
+            "videos": videos,
+            "count": len(videos),
         }
 
+    # Single video
+    if video_info.get("availability") != "public":
+        return {"error": "Video is private, unlisted, or unavailable"}
+
+    single_url = video_info.get("webpage_url")
     return {
         "type": "video",
-        "url": video_info.get("webpage_url"),
+        "url": single_url,
         "title": video_info.get("title"),
-        "thumbnail": video_info.get("thumbnail"),
+        "thumbnail": entry.get("thumbnail"),
         "duration": video_info.get("duration"),
         "uploader": video_info.get("uploader"),
     }

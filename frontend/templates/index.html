@@ -20,7 +20,7 @@
 <form action="/fetch_info" autocomplete="off" method="GET">
     <img src="{{ url_for('static', filename='images/index/search-transparent.svg') }}" alt="Search icon">
     <input type="url" name="url" placeholder="Paste a YouTube URL here..." required>
-    <button type="submit">Convert</button>
+    <button type="submit">Load URL</button>
 </form>
 
 {% if video_info %}

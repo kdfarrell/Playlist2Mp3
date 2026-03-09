@@ -2,7 +2,7 @@
 /* FAQ */
 
 h1 {
-    font-size: var(--fs-4xl);
+    font-size: clamp(var(--fs-3xl), 5vw, var(--fs-4xl));
     text-align: center;
 }
 
@@ -85,6 +85,19 @@ h1 span {
     font-size: var(--fs-xs);
     font-weight: var(--fw-medium);
     padding-bottom: 1rem;
+}
+
+
+@media (max-width:425px) {
+
+    .faq-question {
+        width: 95%;
+    }
+
+    .faq-question::after {
+        right: 0rem;      
+    }
+
 }
 
 

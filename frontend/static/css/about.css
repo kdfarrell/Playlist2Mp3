@@ -36,8 +36,9 @@
 }
 
 h1 {
-    font-size: var(--fs-4xl);
+    font-size: clamp(var(--fs-3xl), 5vw, var(--fs-4xl));
     margin: 1rem 0;
+    text-align: center;
 }
 
 h1 span {
@@ -156,4 +157,15 @@ h1 span {
 
 .abt-privacy li:not(:last-child) {
   margin-bottom: .5rem; 
+}
+
+
+@media (max-width: 425px) {
+
+    .abt-why-us .reasons {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+    
+
 }

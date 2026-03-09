@@ -107,6 +107,30 @@ form button:hover {
     opacity: .95;  
 }
 
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid white;
+    border-radius: 50%;
+    display: none;
+    animation: spin 0.6s linear infinite;
+}
+
+button.loading .spinner {
+    display: inline-block;
+}
+
+button.loading .btn-text {
+    display: none;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 
 /* Video Header */
 
@@ -247,33 +271,6 @@ form button:hover {
 
 .channel img{
     width: 14px;
-}
-
-.actions {
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-    background-color: var(--clr-primary-bg);
-    color: var(--clr-primary);
-    padding: 6px 14px;
-    width: fit-content;
-    font-size: var(--fs-2xs);
-    font-weight: var(--fw-semi-bold);
-    border-radius: 1rem;
-    cursor: pointer;
-    font-family: var(--ff-heading);
-}
-
-.actions .img-container {
-    width: 14px;
-    height: 14px;       
-    overflow: hidden;
-}
-
-.img-container svg {
-    width: 100%;
-    height: 100%;
-    display: block;   
 }
 
 .summary {

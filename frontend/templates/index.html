@@ -17,12 +17,15 @@
     <p>Paste a video or playlist link and download high-quality MP3 files instantly.</p>
 </section>
 
-<form action="/fetch_info" autocomplete="off" method="GET">
+<form id="convertForm" action="/fetch_info" autocomplete="off" method="GET">
     <div>
         <img src="{{ url_for('static', filename='images/index/search-transparent.svg') }}" alt="Search icon">
         <input type="url" name="url" placeholder="Paste a YouTube URL here..." required>
     </div>
-    <button type="submit">Load URL</button>
+    <button type="submit" id="convertBtn">
+        <span class="btn-text">Convert</span>
+        <span class="spinner"></span>
+    </button>
 </form>
 
 {% if video_info %}
@@ -73,7 +76,7 @@
         <div class="playlist-info">
             <h2 class="playlist-title">
                 <img src="{{ url_for('static', filename='images/index/single-video-icon.svg') }}" alt="Playlist icon">
-                {{ video_info.title }}
+                Featured Video
             </h2>
         </div>
         <a href="{{ url_for('download', url=video_info.url, video_type=video_info.type) }}" class="btn">
@@ -125,4 +128,18 @@
     </div>
 </section>
 
+{% endblock %}
+
+
+{% block scripts %} 
+<script>
+    // For loading animaiton
+    const form = document.getElementById("convertForm");
+    const button = document.getElementById("convertBtn");
+
+    form.addEventListener("submit", () => {
+        button.classList.add("loading");
+        button.disabled = true;
+    });
+</script>
 {% endblock %}

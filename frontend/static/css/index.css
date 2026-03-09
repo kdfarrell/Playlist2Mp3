@@ -178,7 +178,7 @@ button.loading .btn-text {
     font-family: var(--ff-heading);
     padding: .5rem 1rem;
     border-radius: .75rem;
-    font-size: var(--fs-sm);
+    font-size: var(--fs-xs);
     font-weight: var(--fw-semi-bold);
     text-align: center;
 }

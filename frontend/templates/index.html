@@ -17,16 +17,20 @@
     <p>Paste a video or playlist link and download high-quality MP3 files instantly.</p>
 </section>
 
+
+
 <form id="convertForm" action="/fetch_info" autocomplete="off" method="GET">
     <div>
         <img src="{{ url_for('static', filename='images/index/search-transparent.svg') }}" alt="Search icon">
         <input type="url" name="url" placeholder="Paste a YouTube URL here..." required>
     </div>
     <button type="submit" id="convertBtn">
-        <span class="btn-text">Convert</span>
+        <span class="btn-text">Load URL</span>
         <span class="spinner"></span>
     </button>
 </form>
+
+
 
 {% if video_info %}
 <section class="video-container">
@@ -42,7 +46,8 @@
             <p class="playlist-meta">{{ video_info.count }} videos</p>
         </div>
 
-        <a href="{{ url_for('download', url=video_info.url, video_type=video_info.type) }}" class="btn">
+        <!-- Updated download link -->
+        <a href="{{ url_for('download') }}" class="btn">
             Download
         </a>
     </header>
@@ -79,7 +84,9 @@
                 Featured Video
             </h2>
         </div>
-        <a href="{{ url_for('download', url=video_info.url, video_type=video_info.type) }}" class="btn">
+
+        <!-- Updated download link -->
+        <a href="{{ url_for('download') }}" class="btn">
             Download
         </a>
     </header>
@@ -110,6 +117,8 @@
 </section>
 {% endif %}
 
+
+
 <section class="summary">
     <div class="card">
         <img src="{{ url_for('static', filename='images/index/fast-grey.svg') }}" alt="Fast Icon">
@@ -130,16 +139,22 @@
 
 {% endblock %}
 
-
 {% block scripts %} 
 <script>
-    // For loading animaiton
+    // For loading animation
     const form = document.getElementById("convertForm");
     const button = document.getElementById("convertBtn");
 
     form.addEventListener("submit", () => {
         button.classList.add("loading");
         button.disabled = true;
+    });
+
+
+    const downloadBtn = document.getElementById("downloadBtn");
+    downloadBtn.addEventListener("click", () => {
+        downloadBtn.classList.add("disabled");
+        downloadBtn.textContent = "Processing...";
     });
 </script>
 {% endblock %}

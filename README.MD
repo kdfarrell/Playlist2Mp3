@@ -215,10 +215,14 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-
 ### Sync dependencies with UV
 ```bash
 uv sync
+```
+
+### Activate Virtual Environment
+```bash
+.venv/Scripts/activate
 ```
 
 ### Run the backend
@@ -245,3 +249,22 @@ This project allowed significant growth in both backend and frontend development
 - Strengthened **frontend skills**, particularly in responsive layouts and clean UI design.  
 
 Overall, Playlist2Mp3 demonstrates a balance of **practical utility and learning**, providing a solid foundation for future web development projects.
+
+
+## Project Screenshots
+
+### Home Page
+![Home Page](screenshots/Home.png)
+
+### Videos / Playlist Download
+![Videos / Playlist Download](screenshots/Videos.png)
+
+### How It Works
+![How It Works](screenshots/How_it_Works.png)
+
+### FAQ Page
+![FAQ Page](screenshots/FAQ.png)
+
+### About Page
+![About Page](screenshots/About.png)
+

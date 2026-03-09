@@ -96,6 +96,7 @@ def download():
 
         else:
             return "Invalid type.", 400
+        
 
     except Exception as e:
         return f"Error during download: {str(e)}", 500

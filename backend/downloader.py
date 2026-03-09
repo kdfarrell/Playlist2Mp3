@@ -86,7 +86,7 @@ def fetch_video_info(video_url):
 
 # ---------------- Download Audio ---------------- #
 
-def download_audio(video_url):
+def download_audio(video_url, video_type):
 
     # Unique folder per download
     job_id = str(uuid.uuid4())
@@ -100,7 +100,7 @@ def download_audio(video_url):
         "postprocessors": [{
             "key": "FFmpegExtractAudio",
             "preferredcodec": "mp3",
-            "preferredquality": "192"
+            "preferredquality": "320"
         }],
         "concurrent_fragment_downloads": 4,
         "skip_unavailable_fragments": True,

@@ -191,12 +191,12 @@ button.loading .btn-text {
     display: flex;
     border-radius: 1rem;
     gap: 1rem;
+    padding: .5rem;
 }
 
 .video:not(:last-child) {
     margin-bottom: 1.75rem;
 }
-
 
 
 /* Thumbnail Image */
@@ -300,6 +300,36 @@ button.loading .btn-text {
     color: var(--text-secondary);
 }
 
+
+/* Flash */
+
+
+.flash {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100%);
+    padding: 12px 20px;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.5s ease;
+}
+
+.flash.show {
+    transform: translateX(-50%) translateY(10px);
+    opacity: 1;
+}
+
+.flash.error { 
+    background-color: #e74c3c; 
+}
+
+.flash.success { 
+    background-color: #2ecc71; 
+}
 
 
 @media (max-width: 768px) {

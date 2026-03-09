@@ -1,7 +1,11 @@
 from urllib.parse import urlparse
 import re
 
+# ---------------- Logger ---------------- #
 class SilentLogger:
+    """
+    Logger that ignores certain messages to reduce clutter
+    """
     def debug(self, msg):
         pass
 
@@ -11,46 +15,50 @@ class SilentLogger:
             "ffmpeg not found",
             "unavailable videos are hidden"
         ]
-        if not any(phrase in msg for phrase in ignore_phrases):
+        should_ignore = False
+        for phrase in ignore_phrases:
+            if phrase in msg:
+                should_ignore = True
+        if not should_ignore:
             print(msg)
 
     def error(self, msg):
-        print(msg)  
+        print(msg)
 
-
+# ---------------- URL Validation ---------------- #
 def is_valid_url(url):
+    """
+    Check if a URL is a valid YouTube video or playlist URL
+    """
     parsed = urlparse(url)
 
-    # Must be http or https
     if parsed.scheme not in ["https", "http"]:
         return False
 
-    # Must be one of the allowed domains
-    if parsed.netloc not in ["youtube.com", "m.youtube.com", "youtu.be"]:
+    if parsed.netloc not in ["youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be"]:
         return False
 
-    # For www/m.youtube.com, check path
     if parsed.netloc in ["www.youtube.com", "m.youtube.com"]:
         if parsed.path not in ["/watch", "/playlist"] and not parsed.path.startswith("/shorts"):
             return False
 
-    # For youtu.be, must have a video ID
     if parsed.netloc == "youtu.be":
         if not parsed.path.strip("/"):
             return False
 
     return True
 
-
+# ---------------- Safe Filename ---------------- #
 def safe_filename(name):
+    """
+    Remove characters that are illegal in file names
+    """
     return re.sub(r'[\\/*?:"<>|]', "", name)
 
-
+# ---------------- Duration Formatting ---------------- #
 def format_duration(seconds):
     """
-    Convert seconds to M:SS or H:MM:SS format.
-    - 390  -> "6:30"
-    - 3900 -> "1:05:00"
+    Convert seconds to H:MM:SS or M:SS format
     """
     if seconds is None:
         return None
@@ -63,4 +71,3 @@ def format_duration(seconds):
         return f"{hours}:{minutes:02d}:{secs:02d}"  # H:MM:SS
     else:
         return f"{minutes}:{secs:02d}"              # M:SS
-

@@ -1,5 +1,10 @@
-venv/
-downloads/*
-downloads/.gitkeep
-__pycache__*
+# Ignore Python cache and editor settings
+__pycache__*/
 .vscode
+
+# Ignore everything in downloads/ except .gitkeep
+downloads/*
+!downloads/.gitkeep
+
+# Ignore virtual environment
+venv/

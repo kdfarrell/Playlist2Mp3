@@ -30,6 +30,12 @@
     </button>
 </form>
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+{% endwith %}
+
 
 
 {% if video_info %}
@@ -47,7 +53,7 @@
         </div>
 
         <!-- Updated download link -->
-        <a href="{{ url_for('download') }}" class="btn">
+        <a href="{{ url_for('download') }}" class="btn downloadBtn" >
             Download
         </a>
     </header>
@@ -86,7 +92,7 @@
         </div>
 
         <!-- Updated download link -->
-        <a href="{{ url_for('download') }}" class="btn">
+        <a href="{{ url_for('download') }}" class="btn downloadBtn">
             Download
         </a>
     </header>
@@ -141,7 +147,7 @@
 
 {% block scripts %} 
 <script>
-    // For loading animation
+    // Loading animation for the form
     const form = document.getElementById("convertForm");
     const button = document.getElementById("convertBtn");
 
@@ -150,11 +156,21 @@
         button.disabled = true;
     });
 
+    // Handle all download buttons safely
+    const downloadBtns = document.querySelectorAll(".downloadBtn");
+    downloadBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            btn.classList.add("disabled");
+            btn.textContent = "Processing...";
+        });
+    });
 
-    const downloadBtn = document.getElementById("downloadBtn");
-    downloadBtn.addEventListener("click", () => {
-        downloadBtn.classList.add("disabled");
-        downloadBtn.textContent = "Processing...";
+    // Flash popup animation
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".flash").forEach(el => {
+            el.classList.add("show");  // slide down
+            setTimeout(() => el.classList.remove("show"), 3000); // slide back up after 3s
+        });
     });
 </script>
 {% endblock %}

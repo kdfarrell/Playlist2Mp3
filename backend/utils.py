@@ -46,4 +46,21 @@ def safe_filename(name):
     return re.sub(r'[\\/*?:"<>|]', "", name)
 
 
+def format_duration(seconds):
+    """
+    Convert seconds to M:SS or H:MM:SS format.
+    - 390  -> "6:30"
+    - 3900 -> "1:05:00"
+    """
+    if seconds is None:
+        return None
+
+    hours = seconds // 3600
+    minutes = (seconds % 3600) // 60
+    secs = seconds % 60
+
+    if hours > 0:
+        return f"{hours}:{minutes:02d}:{secs:02d}"  # H:MM:SS
+    else:
+        return f"{minutes}:{secs:02d}"              # M:SS
 

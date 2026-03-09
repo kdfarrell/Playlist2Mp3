@@ -1,5 +1,5 @@
 from yt_dlp import YoutubeDL
-from utils import SilentLogger, safe_filename
+from utils import SilentLogger, safe_filename, format_duration
 import os
 from urllib.parse import urlparse
 
@@ -58,7 +58,7 @@ def fetch_video_info(video_url):
                 "url": entry_url,
                 "title": entry.get("title"),
                 "thumbnail": entry.get("thumbnail"),
-                "duration": entry.get("duration"),
+                "duration": format_duration(entry.get("duration")),
                 "uploader": entry.get("uploader"),
             })
 
@@ -79,8 +79,8 @@ def fetch_video_info(video_url):
         "type": "video",
         "url": single_url,
         "title": video_info.get("title"),
-        "thumbnail": entry.get("thumbnail"),
-        "duration": video_info.get("duration"),
+        "thumbnail": video_info.get("thumbnail"),
+        "duration": format_duration(video_info.get("duration")),
         "uploader": video_info.get("uploader"),
     }
 

@@ -1,8 +1,9 @@
-from flask import Flask, request, render_template, session, redirect, url_for, send_file, flash
+from flask import Flask, request, render_template, session, redirect, url_for, send_file, flash, after_this_request
 from downloader import download_audio, fetch_video_info, cleanup_downloads
 from utils import safe_filename, is_valid_url
 from pathlib import Path
 import os
+import io
 import tempfile
 import zipfile
 import shutil
@@ -59,7 +60,7 @@ def download():
 
         # Download audio
         download_path, info = download_audio(video_info["url"], video_info["type"])
-        session.pop("video_info", None)  # Clear session after starting download
+        session.pop("video_info", None)
 
         # Gather all mp3 files in download folder
         mp3_files = []
@@ -68,35 +69,46 @@ def download():
                 mp3_files.append(f)
 
         # ---------------- Single Video ---------------- #
-        
+
         if video_info["type"] == "video":
             if len(mp3_files) == 0:
                 return "File not found.", 404
 
             mp3_file = mp3_files[0]
 
+            @after_this_request
+            def cleanup(response):
+                shutil.rmtree(download_path, ignore_errors=True)
+                return response
+
             return send_file(mp3_file, as_attachment=True, download_name=mp3_file.name)
 
         # ---------------- Playlist ---------------- #
+
         elif video_info["type"] == "playlist":
             if len(mp3_files) == 0:
                 return "No audio files found in playlist.", 404
 
-            # Create temporary zip file
             zip_temp = tempfile.NamedTemporaryFile(delete=False, suffix=".zip")
-            zip_temp.close()  # Release file so ZipFile can write to it
+            zip_temp.close()
 
-            # Write all mp3 files to zip
             with zipfile.ZipFile(zip_temp.name, "w", zipfile.ZIP_DEFLATED) as zipf:
                 for f in mp3_files:
                     zipf.write(f, arcname=f.name)
 
             playlist_name = safe_filename(info.get("title", video_info.get("title", "playlist")))
-            return send_file(zip_temp.name, as_attachment=True, download_name=f"{playlist_name}.zip")
+
+            # Read zip into memory, then delete files before sending
+            with open(zip_temp.name, "rb") as f:
+                zip_bytes = io.BytesIO(f.read())
+
+            os.unlink(zip_temp.name)
+            shutil.rmtree(download_path, ignore_errors=True)
+
+            return send_file(zip_bytes, as_attachment=True, download_name=f"{playlist_name}.zip", mimetype="application/zip")
 
         else:
             return "Invalid type.", 400
-        
 
     except Exception as e:
         return f"Error during download: {str(e)}", 500

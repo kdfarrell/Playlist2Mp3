@@ -7,6 +7,9 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png')}}">
     <title>{% block title %} Playlist2Mp3 {% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toast.css') }}">
+
+
 
     {% block head_extra %} {% endblock %}
 
@@ -15,6 +18,11 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Grotesk:wght@300..700&display=swap"
         rel="stylesheet">
+
+
+    <!-- Before </body> -->
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+
 </head>
 
 <body>
@@ -40,6 +48,9 @@
         </header>
         <!-- Main Content Here -->
         <main>
+
+
+
             {% block content%} {% endblock %}
         </main>
         <footer>

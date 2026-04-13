@@ -1,20 +1,19 @@
-from flask import Flask, request, render_template, session, redirect, url_for, send_file, after_this_request, Response, stream_with_context
+from flask import Flask, request, render_template, session, redirect, url_for, send_file, after_this_request
 from downloader import download_audio, fetch_video_info, cleanup_downloads
 from utils import safe_filename, is_valid_url
+from pathlib import Path
 import os
 import io
 import tempfile
 import zipfile
 import shutil
-import json
-import queue
 import threading
 import uuid
 
-from pathlib import Path
 
-# ---------------- App Setup ---------------- #
-BASE_DIR = os.path.dirname(__file__)
+# ── App Setup ──────────────────────────────────────────────────────────────
+
+BASE_DIR     = os.path.dirname(__file__)
 FRONTEND_DIR = os.path.join(BASE_DIR, "..", "frontend")
 
 app = Flask(
@@ -26,83 +25,35 @@ app = Flask(
 
 app.secret_key = "supersecret"
 
-# In-memory progress store: job_id -> list of events
-fetch_progress_store = {}
+# In-memory job stores keyed by job_id
+fetch_progress_store    = {}
 download_progress_store = {}
 
-# Download uses a simple queue (one download at a time)
-download_queue = queue.Queue()
 
+# ── Home ───────────────────────────────────────────────────────────────────
 
-# ---------------- Routes ---------------- #
 @app.route("/")
 def home():
     return render_template("index.html", video_info=None)
 
 
-# ---------------- Fetch Info ---------------- #
-@app.route("/fetch_info")
-def fetch_info():
-    url = request.args.get("url")
-    if not url:
-        return redirect(url_for("home"))
+# ── Fetch Info Async ───────────────────────────────────────────────────────
 
-    if not is_valid_url(url):
-        return render_template("index.html", video_info=None,
-                               fetch_error="Invalid URL. Please enter a valid YouTube URL.")
-
-    job_id = str(uuid.uuid4())
-    fetch_progress_store[job_id] = {"events": [], "done": False}
-
-    result_holder = {}
-
-    def progress_callback(data):
-        fetch_progress_store[job_id]["events"].append(data)
-
-    def run_fetch():
-        video_info, skipped = fetch_video_info(url, progress_callback=progress_callback)
-        result_holder["video_info"] = video_info
-        result_holder["skipped"] = skipped
-        fetch_progress_store[job_id]["done"] = True
-
-    t = threading.Thread(target=run_fetch)
-    t.start()
-    t.join()
-
-    # Clean up progress store
-    fetch_progress_store.pop(job_id, None)
-
-    video_info = result_holder.get("video_info", {})
-    skipped = result_holder.get("skipped", [])
-
-    if "error" in video_info:
-        return render_template("index.html", video_info=None,
-                               fetch_error=video_info["error"])
-
-    session["video_info"] = video_info
-    session["skipped_count"] = len(skipped)
-    return render_template("index.html", video_info=video_info, skipped=skipped)
-
-
-# ---------------- Fetch Info JSON (async polling endpoint) ---------------- #
 @app.route("/fetch_info_async")
 def fetch_info_async():
-    """
-    Kicks off a background fetch and returns a job_id immediately.
-    The client polls /fetch_progress/<job_id> for updates.
-    When done, the client calls /fetch_result/<job_id> for the final HTML.
-    """
+    """Kick off a background fetch job and return a job_id immediately.
+    The client polls /fetch_progress/<job_id>, then loads /fetch_result/<job_id>."""
     url = request.args.get("url")
     if not url or not is_valid_url(url):
         return {"error": "Invalid URL. Please enter a valid YouTube URL."}, 400
 
     job_id = str(uuid.uuid4())
     fetch_progress_store[job_id] = {
-        "events": [],
-        "done": False,
+        "events":     [],
+        "done":       False,
         "video_info": None,
-        "skipped": [],
-        "error": None
+        "skipped":    [],
+        "error":      None,
     }
 
     def progress_callback(data):
@@ -117,37 +68,38 @@ def fetch_info_async():
             store["error"] = video_info["error"]
         else:
             store["video_info"] = video_info
-            store["skipped"] = skipped
+            store["skipped"]    = skipped
         store["done"] = True
 
-    t = threading.Thread(target=run_fetch)
-    t.start()
-
+    threading.Thread(target=run_fetch).start()
     return {"job_id": job_id}
 
 
-# ---------------- Poll fetch progress ---------------- #
+# ── Fetch Progress Poll ────────────────────────────────────────────────────
+
 @app.route("/fetch_progress/<job_id>")
 def fetch_progress_poll(job_id):
+    """Return and drain any pending fetch progress events for a job."""
     store = fetch_progress_store.get(job_id)
     if store is None:
         return {"error": "Job not found"}, 404
 
-    # Return all pending events and whether done
-    events = store["events"][:]
-    store["events"] = []  # clear consumed events
+    events          = store["events"][:]
+    store["events"] = []
 
     return {
-        "events": events,
-        "done": store["done"],
-        "error": store.get("error"),
-        "skipped": store.get("skipped", []) if store["done"] else []
+        "events":  events,
+        "done":    store["done"],
+        "error":   store.get("error"),
+        "skipped": store.get("skipped", []) if store["done"] else [],
     }
 
 
-# ---------------- Fetch result HTML ---------------- #
+# ── Fetch Result Page ──────────────────────────────────────────────────────
+
 @app.route("/fetch_result/<job_id>")
 def fetch_result(job_id):
+    """Render the results page once the fetch job is complete."""
     store = fetch_progress_store.pop(job_id, None)
     if store is None:
         return render_template("index.html", video_info=None,
@@ -158,67 +110,51 @@ def fetch_result(job_id):
                                fetch_error=store["error"])
 
     video_info = store.get("video_info")
-    skipped = store.get("skipped", [])
+    skipped    = store.get("skipped", [])
 
     if not video_info:
         return render_template("index.html", video_info=None,
                                fetch_error="Failed to load video info.")
 
-    session["video_info"] = video_info
+    session["video_info"]    = video_info
     session["skipped_count"] = len(skipped)
     return render_template("index.html", video_info=video_info, skipped=skipped)
 
 
-# ---------------- SSE: Download Progress ---------------- #
-@app.route("/progress")
-def progress():
-    def generate():
-        while True:
-            try:
-                msg = download_queue.get(timeout=60)
-                yield f"data: {json.dumps(msg)}\n\n"
-                if msg.get("status") in ("done", "error"):
-                    break
-            except queue.Empty:
-                yield 'data: {"status":"heartbeat"}\n\n'
+# ── Download ───────────────────────────────────────────────────────────────
 
-    return Response(
-        stream_with_context(generate()),
-        mimetype="text/event-stream",
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
-    )
-
-
-# ---------------- Download ---------------- #
-# Replace the /download route
 @app.route("/download")
 def download():
-    """Step 1: start the download job, return a job_id immediately."""
+    """Step 1: validate the session, start the download job, return a job_id."""
     video_info = session.get("video_info")
     if not video_info:
         return {"error": "Session expired."}, 400
 
-    if video_info["type"] == "playlist" and video_info.get("count", 0) == 0:
+    video_type = video_info.get("type")
+    if video_type not in ("video", "playlist"):
+        return {"error": "Invalid video type."}, 400
+
+    if video_type == "playlist" and video_info.get("count", 0) == 0:
         return {"error": "No downloadable videos found in this playlist."}, 400
 
     cleanup_downloads(max_age_seconds=3600)
 
-    skipped_count = session.get("skipped_count", 0)
-    total_videos = video_info.get("count", 1) if video_info["type"] == "playlist" else 1
-
-    if video_info["type"] == "playlist":
-        urls_to_download = [v["url"] for v in video_info.get("videos", [])]
-    else:
-        urls_to_download = [video_info["url"]]
+    skipped_count    = session.get("skipped_count", 0)
+    total_videos     = video_info.get("count", 1) if video_type == "playlist" else 1
+    urls_to_download = (
+        [v["url"] for v in video_info.get("videos", [])]
+        if video_type == "playlist"
+        else [video_info["url"]]
+    )
 
     job_id = str(uuid.uuid4())
     download_progress_store[job_id] = {
-        "events": [],
-        "done": False,
-        "error": None,
-        "path": None,
-        "video_info": video_info,
-        "skipped_count": skipped_count
+        "events":        [],
+        "done":          False,
+        "error":         None,
+        "path":          None,
+        "video_info":    video_info,
+        "skipped_count": skipped_count,
     }
 
     def progress_callback(d):
@@ -229,11 +165,11 @@ def download():
     def run_download():
         store = download_progress_store.get(job_id)
         try:
-            path, info = download_audio(
+            path, _ = download_audio(
                 urls_to_download,
-                video_info["type"],
+                video_type,
                 total_videos=total_videos,
-                progress_callback=progress_callback
+                progress_callback=progress_callback,
             )
             if store:
                 store["path"] = str(path)
@@ -244,32 +180,41 @@ def download():
             if store:
                 store["done"] = True
 
-    t = threading.Thread(target=run_download)
-    t.start()
-
+    threading.Thread(target=run_download).start()
     return {"job_id": job_id}
 
 
+# ── Download Progress Poll ─────────────────────────────────────────────────
+
 @app.route("/download_progress/<job_id>")
 def download_progress_poll(job_id):
-    """Step 2: poll this while the download runs."""
+    """Step 2: drain and return pending download progress events."""
     store = download_progress_store.get(job_id)
     if store is None:
         return {"error": "Job not found"}, 404
 
-    events = store["events"][:]
+    events          = store["events"][:]
     store["events"] = []
 
-    return {
+    response = {
         "events": events,
-        "done": store["done"],
-        "error": store.get("error")
+        "done":   store["done"],
+        "error":  store.get("error"),
     }
 
+    # Include skipped_count in the final poll so the client can show a toast
+    # without needing a separate request
+    if store["done"] and not store.get("error"):
+        response["skipped_count"] = store["skipped_count"]
+
+    return response
+
+
+# ── Download File ──────────────────────────────────────────────────────────
 
 @app.route("/download_file/<job_id>")
 def download_file(job_id):
-    """Step 3: called once polling says done — streams the actual file."""
+    """Step 3: serve the finished file. The browser treats this as a native download."""
     store = download_progress_store.pop(job_id, None)
     if store is None:
         return "Job not found or expired.", 404
@@ -278,18 +223,17 @@ def download_file(job_id):
         return f"Download failed: {store['error']}", 500
 
     download_path = Path(store["path"])
-    video_info = store["video_info"]
-    skipped_count = store["skipped_count"]
+    video_info    = store["video_info"]
+    mp3_files     = [f for f in download_path.iterdir() if f.suffix.lower() == ".mp3"]
 
-    mp3_files = [f for f in download_path.iterdir() if f.suffix.lower() == ".mp3"]
-
-    session.pop("video_info", None)
+    session.pop("video_info",    None)
     session.pop("skipped_count", None)
 
     if video_info["type"] == "video":
         if not mp3_files:
             return "File not found.", 404
-        mp3_file = mp3_files[0]
+
+        mp3_file   = mp3_files[0]
         clean_name = safe_filename(video_info.get("title", mp3_file.stem)) + ".mp3"
 
         @after_this_request
@@ -297,11 +241,9 @@ def download_file(job_id):
             shutil.rmtree(download_path, ignore_errors=True)
             return response
 
-        response = send_file(mp3_file, as_attachment=True, download_name=clean_name)
-        response.headers["X-Skipped-Count"] = str(skipped_count)
-        return response
+        return send_file(mp3_file, as_attachment=True, download_name=clean_name)
 
-    elif video_info["type"] == "playlist":
+    if video_info["type"] == "playlist":
         if not mp3_files:
             return "No audio files found in playlist.", 404
 
@@ -320,15 +262,18 @@ def download_file(job_id):
         os.unlink(zip_temp.name)
         shutil.rmtree(download_path, ignore_errors=True)
 
-        response = send_file(zip_bytes, as_attachment=True,
-                             download_name=f"{playlist_name}.zip",
-                             mimetype="application/zip")
-        response.headers["X-Skipped-Count"] = str(skipped_count)
-        return response
+        return send_file(
+            zip_bytes,
+            as_attachment=True,
+            download_name=f"{playlist_name}.zip",
+            mimetype="application/zip",
+        )
 
     return "Invalid type.", 400
 
-# ---------------- Additional Pages ---------------- #
+
+# ── Additional Pages ───────────────────────────────────────────────────────
+
 @app.route("/about")
 def about():
     return render_template("about.html")
@@ -340,6 +285,7 @@ def faq():
 @app.route("/how-it-works")
 def how_it_works():
     return render_template("how_it_works.html")
+
 
 if __name__ == "__main__":
     app.run(debug=True, threaded=True)

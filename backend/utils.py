@@ -1,73 +1,76 @@
 from urllib.parse import urlparse
 import re
 
-# ---------------- Logger ---------------- #
+
+# ---------------- SILENT LOGGER ---------------- #
+
 class SilentLogger:
-    """
-    Logger that ignores certain messages to reduce clutter
-    """
+    # Suppress debug output entirely
     def debug(self, msg):
         pass
 
+    # Only print warnings not in the ignore list
     def warning(self, msg):
         ignore_phrases = [
             "No supported JavaScript runtime",
             "ffmpeg not found",
             "unavailable videos are hidden"
         ]
-        should_ignore = False
-        for phrase in ignore_phrases:
-            if phrase in msg:
-                should_ignore = True
-        if not should_ignore:
+        if not any(phrase in msg for phrase in ignore_phrases):
             print(msg)
 
+    # Always print errors
     def error(self, msg):
         print(msg)
 
-# ---------------- URL Validation ---------------- #
+
+# ---------------- URL VALIDATION ---------------- #
+
 def is_valid_url(url):
-    """
-    Check if a URL is a valid YouTube video or playlist URL
-    """
+    # Reject anything that is not a recognised YouTube domain and path
     parsed = urlparse(url)
 
+    # Must be http or https
     if parsed.scheme not in ["https", "http"]:
         return False
 
+    # Must be a YouTube domain
     if parsed.netloc not in ["youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be"]:
         return False
 
+    # Standard YouTube domains only allow /watch, /playlist, or /shorts paths
     if parsed.netloc in ["www.youtube.com", "m.youtube.com"]:
         if parsed.path not in ["/watch", "/playlist"] and not parsed.path.startswith("/shorts"):
             return False
 
+    # youtu.be short links must have a video ID in the path
     if parsed.netloc == "youtu.be":
         if not parsed.path.strip("/"):
             return False
 
     return True
 
-# ---------------- Safe Filename ---------------- #
+
+# ---------------- SAFE FILENAME ---------------- #
+
 def safe_filename(name):
-    """
-    Remove characters that are illegal in file names
-    """
+    # Strip characters that are illegal in Windows and Unix filenames
     return re.sub(r'[\\/*?:"<>|]', "", name)
 
-# ---------------- Duration Formatting ---------------- #
+
+# ---------------- DURATION FORMATTING ---------------- #
+
 def format_duration(seconds):
-    """
-    Convert seconds to H:MM:SS or M:SS format
-    """
+    # Return None if no duration is available
     if seconds is None:
         return None
 
-    hours = seconds // 3600
+    hours   = seconds // 3600
     minutes = (seconds % 3600) // 60
-    secs = seconds % 60
+    secs    = seconds % 60
 
+    # H:MM:SS for videos over an hour, M:SS otherwise
     if hours > 0:
-        return f"{hours}:{minutes:02d}:{secs:02d}"  # H:MM:SS
+        return f"{hours}:{minutes:02d}:{secs:02d}"
     else:
-        return f"{minutes}:{secs:02d}"              # M:SS
+        return f"{minutes}:{secs:02d}"

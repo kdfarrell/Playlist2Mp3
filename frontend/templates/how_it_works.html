@@ -2,18 +2,24 @@
 
 {% block title %}Playlist2Mp3 | How It Works{% endblock %}
 
-{% block head_extra%}
+{% block head_extra %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/how_it_works.css') }}">
 {% endblock %}
 
 
-{% block content %} 
+{% block content %}
+
+<!-- HERO -->
 <section class="how-hero">
     <h1>How it <span>Works</span></h1>
     <p>Four simple steps to convert any YouTube content to MP3.</p>
 </section>
 
+
+<!-- STEPS -->
 <section class="steps-container">
+
+    <!-- STEP 1 -->
     <div class="step">
         <div class="img-container">
             <img src="{{ url_for('static', filename='images/how_it_works/link-icon.svg') }}" alt="Link icon">
@@ -25,6 +31,7 @@
         </div>
     </div>
 
+    <!-- STEP 2 -->
     <div class="step">
         <div class="img-container">
             <img src="{{ url_for('static', filename='images/how_it_works/search-icon.svg') }}" alt="Search icon">
@@ -36,6 +43,7 @@
         </div>
     </div>
 
+    <!-- STEP 3 -->
     <div class="step">
         <div class="img-container">
             <img src="{{ url_for('static', filename='images/how_it_works/download-icon.svg') }}" alt="Download icon">
@@ -47,6 +55,7 @@
         </div>
     </div>
 
+    <!-- STEP 4 -->
     <div class="step">
         <div class="img-container">
             <img src="{{ url_for('static', filename='images/how_it_works/headphone-icon.svg') }}" alt="Headphone icon">
@@ -57,6 +66,7 @@
             <p>Listen to your favorite tracks anytime, anywhere — no internet connection needed.</p>
         </div>
     </div>
+
 </section>
 
 {% endblock %}

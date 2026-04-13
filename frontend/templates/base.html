@@ -2,23 +2,36 @@
 <html lang="en">
 
 <head>
+
+    <!-- METADATA -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png')}}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
     <title>{% block title %} Playlist2Mp3 {% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css')}}">
 
+
+    <!-- BASE STYLES -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toast.css') }}">
+
+
+    <!-- PAGE-SPECIFIC HEAD -->
     {% block head_extra %} {% endblock %}
 
+
+    <!-- FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Grotesk:wght@300..700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Grotesk:wght@300..700&display=swap"
         rel="stylesheet">
+
 </head>
 
 <body>
+
     <div class="page-container">
+
+        <!-- HEADER & NAV -->
         <header>
             <div class="logo-container">
                 <a href="{{ url_for('home') }}">
@@ -27,9 +40,7 @@
                 </a>
             </div>
             <nav class="nav">
-                <button class="nav-toggle" aria-label="Toggle Menu">
-                    ☰
-                </button>
+                <button class="nav-toggle" aria-label="Toggle Menu">☰</button>
                 <ul class="nav-menu">
                     <li><a href="{{ url_for('home') }}">Home</a></li>
                     <li><a href="{{ url_for('how_it_works') }}">How It Works</a></li>
@@ -38,25 +49,40 @@
                 </ul>
             </nav>
         </header>
-        <!-- Main Content Here -->
+
+
+        <!-- MAIN CONTENT -->
         <main>
-            {% block content%} {% endblock %}
+            {% block content %} {% endblock %}
         </main>
+
+
+        <!-- FOOTER -->
         <footer>
-            <p>© 2026 Playlist2Mp3 • Devloped by <a href="https://github.com/kdfarrell" target="_blank">Darius</a></p>
+            <p>© 2026 Playlist2Mp3 • Developed by <a href="https://github.com/kdfarrell" target="_blank">Darius</a></p>
         </footer>
+
     </div>
 
 
+    <!-- NAVBAR TOGGLE -->
     <script>
         const toggle = document.querySelector(".nav-toggle");
-        const menu = document.querySelector(".nav-menu");
+        const menu   = document.querySelector(".nav-menu");
 
         toggle.addEventListener("click", () => {
             menu.classList.toggle("active");
         });
     </script>
+
+
+    <!-- TOAST SCRIPT -->
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+
+
+    <!-- PAGE-SPECIFIC SCRIPTS -->
     {% block scripts %} {% endblock %}
+
 </body>
 
 </html>

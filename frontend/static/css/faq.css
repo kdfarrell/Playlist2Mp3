@@ -1,5 +1,4 @@
-
-/* FAQ */
+/* ----- HERO ----- */
 
 h1 {
     font-size: clamp(var(--fs-3xl), 5vw, var(--fs-4xl));
@@ -19,7 +18,7 @@ h1 span {
 }
 
 
-/* FAQ Types */
+/* ----- FAQ ITEMS ----- */
 
 .faq-container section:not(:last-child) {
     margin-bottom: 2rem;
@@ -59,9 +58,9 @@ h1 span {
 .faq-question::after {
     content: '';
     position: absolute;
-    right: 1rem;      
-    top: 50%;       
-    transform: translateY(-50%) rotate(45deg); 
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
     width: 5px;
     height: 5px;
     border-right: 2px solid var(--text-primary);
@@ -88,20 +87,16 @@ h1 span {
 }
 
 
-@media (max-width:425px) {
+/* ----- RESPONSIVE ----- */
+
+@media (max-width: 425px) {
 
     .faq-question {
         width: 95%;
     }
 
     .faq-question::after {
-        right: 0rem;      
+        right: 0rem;
     }
 
 }
-
-
-
-
-
-

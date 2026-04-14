@@ -1,3 +1,4 @@
+/* ----- HERO ----- */
 
 .icon {
     width: 40px;
@@ -24,7 +25,7 @@
     background-color: var(--clr-primary-bg);
 }
 
-.our-story img{
+.our-story img {
     width: 20px;
     height: auto;
 }
@@ -52,8 +53,8 @@ h1 span {
     text-align: center;
 }
 
-/* Mission Section */
 
+/* ----- MISSION ----- */
 
 .abt-mission {
     display: flex;
@@ -65,7 +66,7 @@ h1 span {
     background-color: var(--clr-card-background);
 }
 
-.mission-header  {
+.mission-header {
     justify-content: flex-start;
     gap: 1rem;
     padding: 0;
@@ -82,7 +83,7 @@ h1 span {
 }
 
 
-/* Why Us Section */
+/* ----- WHY US ----- */
 
 .abt-why-us {
     width: 100%;
@@ -125,8 +126,7 @@ h1 span {
 }
 
 
-/* Privacy Matters Section */
-
+/* ----- PRIVACY ----- */
 
 .abt-privacy {
     width: 100%;
@@ -147,18 +147,19 @@ h1 span {
     font-size: var(--fs-lg);
 }
 
-
 .abt-privacy li {
     color: var(--text-secondary);
-    font-size: var(--fs-xs); 
-    list-style: disc; 
+    font-size: var(--fs-xs);
+    list-style: disc;
     list-style-position: inside;
 }
 
 .abt-privacy li:not(:last-child) {
-  margin-bottom: .5rem; 
+    margin-bottom: .5rem;
 }
 
+
+/* ----- RESPONSIVE ----- */
 
 @media (max-width: 425px) {
 
@@ -166,6 +167,5 @@ h1 span {
         grid-template-columns: 1fr;
         grid-template-rows: auto;
     }
-    
 
 }

@@ -1,3 +1,4 @@
+/* ----- HERO ----- */
 
 h1 {
     font-size: clamp(var(--fs-3xl), 5vw, var(--fs-4xl));
@@ -22,7 +23,8 @@ h1 span {
     margin: 0 auto;
 }
 
-/* Card */
+
+/* ----- STEPS ----- */
 
 .steps-container {
     max-width: 36rem;
@@ -41,15 +43,14 @@ h1 span {
 
 .step:not(:last-child) .img-container::after {
     content: '';
-    position: absolute;     
-    left: 49%;  
-    top: 94%;    
+    position: absolute;
+    left: 49%;
+    top: 94%;
     height: 120px;
     border-right: 1px solid var(--clr-border);
     border-bottom: 1px solid var(--clr-border);
     transition: transform 0.3s ease;
 }
-
 
 .step:not(:last-child) {
     margin-bottom: 2rem;
@@ -62,8 +63,7 @@ h1 span {
     border-radius: 1rem;
 }
 
-
-.step-info span{
+.step-info span {
     font-size: var(--fs-2xs);
     margin-bottom: 4px;
     color: var(--clr-primary);
@@ -73,15 +73,12 @@ h1 span {
     font-weight: var(--fw-semi-bold);
 }
 
-
 h2 {
     font-size: var(--fs-md);
     margin-bottom: 4px;
-
 }
 
-
-.step-info p{
+.step-info p {
     font-size: var(--fs-xs);
     color: var(--text-secondary);
     font-weight: var(--fw-regular);

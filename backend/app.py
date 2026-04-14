@@ -11,7 +11,7 @@ import threading
 import uuid
 
 
-# ── App Setup ──────────────────────────────────────────────────────────────
+# ----- APP SETUP -----
 
 BASE_DIR     = os.path.dirname(__file__)
 FRONTEND_DIR = os.path.join(BASE_DIR, "..", "frontend")
@@ -30,14 +30,14 @@ fetch_progress_store    = {}
 download_progress_store = {}
 
 
-# ── Home ───────────────────────────────────────────────────────────────────
+# ----- HOME -----
 
 @app.route("/")
 def home():
     return render_template("index.html", video_info=None)
 
 
-# ── Fetch Info Async ───────────────────────────────────────────────────────
+# ----- FETCH INFO ASYNC -----
 
 @app.route("/fetch_info_async")
 def fetch_info_async():
@@ -75,7 +75,7 @@ def fetch_info_async():
     return {"job_id": job_id}
 
 
-# ── Fetch Progress Poll ────────────────────────────────────────────────────
+# ----- FETCH PROGRESS POLL -----
 
 @app.route("/fetch_progress/<job_id>")
 def fetch_progress_poll(job_id):
@@ -95,7 +95,7 @@ def fetch_progress_poll(job_id):
     }
 
 
-# ── Fetch Result Page ──────────────────────────────────────────────────────
+# ----- FETCH RESULTS PAGE -----
 
 @app.route("/fetch_result/<job_id>")
 def fetch_result(job_id):
@@ -121,7 +121,7 @@ def fetch_result(job_id):
     return render_template("index.html", video_info=video_info, skipped=skipped)
 
 
-# ── Download ───────────────────────────────────────────────────────────────
+# ----- DOWNLOAD -----
 
 @app.route("/download")
 def download():
@@ -184,7 +184,7 @@ def download():
     return {"job_id": job_id}
 
 
-# ── Download Progress Poll ─────────────────────────────────────────────────
+# ----- DOWNLOAD PROGRESS POLL -----
 
 @app.route("/download_progress/<job_id>")
 def download_progress_poll(job_id):
@@ -210,7 +210,7 @@ def download_progress_poll(job_id):
     return response
 
 
-# ── Download File ──────────────────────────────────────────────────────────
+# ----- DOWNLOAD FILE -----
 
 @app.route("/download_file/<job_id>")
 def download_file(job_id):
@@ -272,7 +272,7 @@ def download_file(job_id):
     return "Invalid type.", 400
 
 
-# ── Additional Pages ───────────────────────────────────────────────────────
+# ----- ADDTIONAL PAGES -----
 
 @app.route("/about")
 def about():

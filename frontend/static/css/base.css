@@ -1,26 +1,27 @@
+/* ----- VARIABLES ----- */
+
 :root {
-    
-    /* Nav Bar Page Links */
+
+    /* ----- COLORS ----- */
+    --clr-primary: #ea4a3e;
+    --clr-primary-bg: rgb(234 74 62 / 10%);
+    --clr-card-background: #fff;
+    --clr-border: #D3D3D3;
+
+    /* ----- TEXT ----- */
+    --text-primary: #231e1b;
+    --text-secondary: #928f88;
+
+    /* ----- NAV LINKS ----- */
     --link-clr-normal: hsl(30 8% 50%);
     --link-clr-hover: hsl(30 10% 12%);
     --link-clr-hover-bg: hsl(35 30% 94%);
 
-    /* Nav Bar Page Link Active Page */
-    --clr-primary: #ea4a3e; 
-    --clr-primary-bg: rgb(234 74 62 / 10%);
-
-    --text-primary: #231e1b;
-    --text-secondary: #928f88;
-
-    --clr-card-background: #fff;
-    --clr-border: #D3D3D3;
-
-    /* Font Family */
+    /* ----- FONT FAMILY ----- */
     --ff-base: "Inter", sans-serif;
     --ff-heading: "Space Grotesk", sans-serif;
 
-
-    /* Font Size Scale */
+    /* ----- FONT SIZE ----- */
     --fs-3xs: 0.625rem;  /* 10px */
     --fs-2xs: 0.75rem;   /* 12px */
     --fs-xs: 0.875rem;   /* 14px */
@@ -32,7 +33,7 @@
     --fs-3xl: 2.25rem;   /* 36px */
     --fs-4xl: 3rem;      /* 48px */
 
-    /* Font Weights */
+    /* ----- FONT WEIGHT ----- */
     --fw-light: 300;
     --fw-regular: 400;
     --fw-medium: 500;
@@ -42,32 +43,41 @@
 }
 
 
+/* ----- RESETS ----- */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-img, span {
+img,
+span {
     display: inline-block;
 }
 
 a {
-    text-decoration: none; 
-    color: inherit;   
+    text-decoration: none;
+    color: inherit;
 }
 
-ul, li {
+ul,
+li {
     list-style: none;
 }
+
+
+/* ----- BASE ----- */
 
 body {
     font-family: var(--ff-base);
     color: var(--text-primary);
-    background-color: #fbfaf8; 
+    background-color: #fbfaf8;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
     font-family: var(--ff-heading);
 }
 
@@ -83,7 +93,7 @@ h1, h2, h3 {
 }
 
 
-/* Navigation Bar */
+/* ----- NAVBAR ----- */
 
 header {
     width: 100%;
@@ -111,8 +121,6 @@ header {
     color: var(--text-primary);
 }
 
-/* Hyperlinks */
-
 .nav-toggle {
     display: none;
     font-size: 1.8rem;
@@ -127,7 +135,7 @@ header {
     gap: .5rem;
 }
 
-.nav-menu  a {
+.nav-menu a {
     font-weight: var(--fw-medium);
     color: var(--text-secondary);
     padding: .25rem .75rem;
@@ -136,13 +144,13 @@ header {
     font-size: var(--fs-xs);
 }
 
-.nav-menu  a:hover {
+.nav-menu a:hover {
     color: var(--link-clr-hover);
     background-color: var(--link-clr-hover-bg);
 }
 
-/* Main */
 
+/* ----- MAIN ----- */
 
 main {
     width: 100%;
@@ -155,7 +163,8 @@ main {
     flex-grow: 1;
 }
 
-/* Footer */
+
+/* ----- FOOTER ----- */
 
 footer {
     padding: 1.5rem 0;
@@ -172,6 +181,8 @@ footer a {
     font-weight: var(--fw-semi-bold);
 }
 
+
+/* ----- RESPONSIVE ----- */
 
 @media (max-width: 768px) {
 
@@ -207,4 +218,5 @@ footer a {
         color: var(--clr-primary);
         background: none;
     }
+
 }

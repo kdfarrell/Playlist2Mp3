@@ -1,3 +1,5 @@
+/* ----- TOAST CONTAINER ----- */
+
 #toast-container {
   position: fixed;
   bottom: 1.5rem;
@@ -8,6 +10,9 @@
   z-index: 9999;
   pointer-events: none;
 }
+
+
+/* ----- TOAST ----- */
 
 .toast {
   padding: .75rem 1.25rem;
@@ -26,6 +31,9 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+
+/* ----- TOAST VARIANTS ----- */
 
 .toast-success { background-color: #2ecc71; }
 .toast-error   { background-color: #e74c3c; }

@@ -24,8 +24,6 @@ This project also served as a learning exercise for backend development, fronten
 
 ### Secondary Goals
 
-- Progress indicators during conversion
-- Improved frontend design with animations
 - Deployment as an online web service
 
 ## Scope & Limitations
@@ -45,7 +43,6 @@ This project also served as a learning exercise for backend development, fronten
 - User accounts or authentication
 - Permanent server-side storage of files
 - Streaming or playback features
-- Mobile applications
 
 ### Ethical / Legal Considerations
 
@@ -168,12 +165,6 @@ Test cases included:
 - Invalid URL handling
 - Skipping unavailable or private videos
 
-Currently, no automated tests are implemented. Future versions will include automated testing for:
-
-- Download functionality
-- MP3 conversion
-- Playlist handling
-
 
 ## Challenges & Problems Faced
 
@@ -195,10 +186,7 @@ Currently, no automated tests are implemented. Future versions will include auto
 
 ## Future Improvements
 
-- Add a download progress bar for playlist downloads
-- Deploy the application online using Docker
-- Implement automated testing
-- Improve error handling and reliability
+- Deploy the application online using Dockeru
 
 ## Project Setup & Installation
 

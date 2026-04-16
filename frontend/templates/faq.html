@@ -1,138 +1,132 @@
 {% extends "base.html" %}
 
-{% block title %}Playlist2Mp3 | FAQ{% endblock%}
+{% block title %}Playlist2Mp3 | FAQ{% endblock %}
 
 {% block head_extra %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/faq.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/faq.css') }}">
 {% endblock %}
 
 
 {% block content %}
 
-<section class="faq-hero">
-    <h1>Frequently Asked <span>Questions</span></h1>
-    <p>Everything you need to know about Playlist2Mp3.</p>
-</section>
-
-<section class="faq-container">
-
-    <section class="faq-general">
-        <h2>General</h2>
-        <div class="faq-item-container">
-            <div class="faq-item">
-                <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-g1"
-                    id="faq-g1-button">
-                    Is Playlist2Mp3 free to use?
-                </button>
-                <div class="faq-answer" id="faq-g1" role="region" aria-labelledby="faq-g1-button">
-                    <p>Yes, Playlist2Mp3 is completely free. No sign-up or subscription required.</p>
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-g2"
-                    id="faq-g2-button">
-                    What audio quality do you offer?
-                </button>
-                <div class="faq-answer" id="faq-g2" role="region" aria-labelledby="faq-g2-button">
-                    <p>We convert videos to MP3 at up to 320kbps, ensuring high-quality audio output.</p>
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-g3"
-                    id="faq-g3-button">
-                    Can I convert entire playlists?
-                </button>
-                <div class="faq-answer" id="faq-g3" role="region" aria-labelledby="faq-g3-button">
-                    <p>Absolutely. Paste a playlist URL and we'll list every track for individual or bulk
-                        download.</p>
-                </div>
-            </div>
-        </div>
+    <!-- HERO SECTION -->
+    <section class="faq-hero">
+        <h1>Frequently Asked <span>Questions</span></h1>
+        <p>Everything you need to know about Playlist2Mp3.</p>
     </section>
 
-    <section class="faq-technical">
-        <h2>Technical</h2>
-        <div class="faq-item-container">
-            <div class="faq-item">
-                <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-t1"
-                    id="faq-t1-button">
-                    Which browsers are supported?
-                </button>
-                <div class="faq-answer" id="faq-t1" role="region" aria-labelledby="faq-t1-button">
-                    <p>Playlist2Mp3 works on all modern browsers including Chrome, Firefox, Safari, and
-                        Edge.</p>
-                </div>
-            </div>
+    <!-- FAQ CONTAINER -->
+    <section class="faq-container">
 
-            <div class="faq-item">
-                <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-t2"
-                    id="faq-t2-button">
-                    Why is my conversion taking long?
-                </button>
-                <div class="faq-answer" id="faq-t2" role="region" aria-labelledby="faq-t2-button">
-                    <p>Conversion speed depends on video length and server load. Most videos convert within
-                        seconds.</p>
+        <!-- GENERAL -->
+        <section class="faq-general">
+            <h2>General</h2>
+            <div class="faq-item-container">
+                <div class="faq-item">
+                    <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-g1" id="faq-g1-button">
+                        Is Playlist2Mp3 free to use?
+                    </button>
+                    <div class="faq-answer" id="faq-g1" role="region" aria-labelledby="faq-g1-button">
+                        <p>Yes, Playlist2Mp3 is completely free. No sign-up or subscription required.</p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="faq-item">
-                <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-t3"
-                    id="faq-t3-button">
-                    Do I need to install anything?
-                </button>
-                <div class="faq-answer" id="faq-t3" role="region" aria-labelledby="faq-t3-button">
-                    <p>No installation needed. Playlist2Mp3 runs entirely in your browser.</p>
+                <div class="faq-item">
+                    <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-g2" id="faq-g2-button">
+                        What audio quality do you offer?
+                    </button>
+                    <div class="faq-answer" id="faq-g2" role="region" aria-labelledby="faq-g2-button">
+                        <p>We convert videos to MP3 at up to 320kbps, ensuring high-quality audio output.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-g3" id="faq-g3-button">
+                        Can I convert entire playlists?
+                    </button>
+                    <div class="faq-answer" id="faq-g3" role="region" aria-labelledby="faq-g3-button">
+                        <p>Absolutely. Paste a playlist URL and we'll list every track for individual or bulk download.</p>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <!-- TECHNICAL -->
+        <section class="faq-technical">
+            <h2>Technical</h2>
+            <div class="faq-item-container">
+                <div class="faq-item">
+                    <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-t1" id="faq-t1-button">
+                        Which browsers are supported?
+                    </button>
+                    <div class="faq-answer" id="faq-t1" role="region" aria-labelledby="faq-t1-button">
+                        <p>Playlist2Mp3 works on all modern browsers including Chrome, Firefox, Safari, and Edge.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-t2" id="faq-t2-button">
+                        Why is my conversion taking long?
+                    </button>
+                    <div class="faq-answer" id="faq-t2" role="region" aria-labelledby="faq-t2-button">
+                        <p>Conversion speed depends on video length and server load. Most videos convert within seconds.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-t3" id="faq-t3-button">
+                        Do I need to install anything?
+                    </button>
+                    <div class="faq-answer" id="faq-t3" role="region" aria-labelledby="faq-t3-button">
+                        <p>No installation needed. Playlist2Mp3 runs entirely in your browser.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRIVACY & SAFETY -->
+        <section class="faq-privacy">
+            <h2>Privacy & Safety</h2>
+            <div class="faq-item-container">
+                <div class="faq-item">
+                    <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-p1" id="faq-p1-button">
+                        Do you store my downloaded files?
+                    </button>
+                    <div class="faq-answer" id="faq-p1" role="region" aria-labelledby="faq-p1-button">
+                        <p>No. We do not store any converted files on our servers. Downloads are generated on the fly.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-p2" id="faq-p2-button">
+                        Is my data safe?
+                    </button>
+                    <div class="faq-answer" id="faq-p2" role="region" aria-labelledby="faq-p2-button">
+                        <p>We don't collect personal data or track your activity. Your privacy is our priority.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </section>
-
-    <section class="faq-privacy">
-        <h2>Privacy & Safety</h2>
-        <div class="faq-item-container">
-            <div class="faq-item">
-                <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-p1"
-                    id="faq-p1-button">
-                    Do you store my downloaded files?
-                </button>
-                <div class="faq-answer" id="faq-p1" role="region" aria-labelledby="faq-p1-button">
-                    <p>No. We do not store any converted files on our servers. Downloads are generated on
-                        the fly.</p>
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-p2"
-                    id="faq-p2-button">
-                    Is my data safe?
-                </button>
-                <div class="faq-answer" id="faq-p2" role="region" aria-labelledby="faq-p2-button">
-                    <p>We don't collect personal data or track your activity. Your privacy is our priority.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-</section>
-
 
 {% endblock %}
 
 
 {% block scripts %}
 <script>
+    // ----- FAQ ITEMS -----
     const faqItems = document.querySelectorAll(".faq-item");
 
     faqItems.forEach(item => {
         const button = item.querySelector(".faq-question");
         const answer = item.querySelector(".faq-answer");
 
+        // ----- TOGGLE ITEM -----
         button.addEventListener("click", () => {
             const isOpen = item.classList.contains("is-open");
 
-            // Close all items
+            // ----- CLOSE ALL -----
             faqItems.forEach(otherItem => {
                 const otherButton = otherItem.querySelector(".faq-question");
                 const otherAnswer = otherItem.querySelector(".faq-answer");
@@ -142,12 +136,11 @@
                 otherAnswer.style.maxHeight = null;
             });
 
-            // Open clicked item if it was closed
+            // ----- OPEN SELECTED -----
             if (!isOpen) {
                 item.classList.add("is-open");
                 button.setAttribute("aria-expanded", "true");
 
-                // Include bottom padding in max-height so it's fully visible
                 const style = getComputedStyle(answer);
                 const paddingBottom = parseInt(style.paddingBottom);
                 answer.style.maxHeight = answer.scrollHeight + paddingBottom + "px";

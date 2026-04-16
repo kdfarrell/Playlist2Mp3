@@ -4,6 +4,7 @@ import os
 import shutil
 import uuid
 import tempfile
+import time
 from pathlib import Path
 
 
@@ -247,11 +248,10 @@ def download_audio(video_urls, video_type, total_videos=1, progress_callback=Non
 # ---------------- CLEANUP OLD DOWNLOADS ---------------- #
 
 def cleanup_downloads(max_age_seconds=3600):
-    # Remove temp download folders older than max_age_seconds
     if not TEMP_DIR.exists():
         return
 
-    now = TEMP_DIR.stat().st_mtime
+    now = time.time() 
 
     for item in TEMP_DIR.iterdir():
         if item.is_dir():

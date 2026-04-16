@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, session, redirect, url_for, send_file, after_this_request
+from flask import Flask, request, render_template, session, url_for, send_file, after_this_request
 from downloader import download_audio, fetch_video_info, cleanup_downloads
 from utils import safe_filename, is_valid_url
 from pathlib import Path

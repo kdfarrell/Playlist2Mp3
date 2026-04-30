@@ -60,16 +60,23 @@ def fetch_info_async():
         fetch_progress_store[job_id]["events"].append(data)
 
     def run_fetch():
-        video_info, skipped = fetch_video_info(url, progress_callback=progress_callback)
         store = fetch_progress_store.get(job_id)
         if store is None:
             return
-        if "error" in video_info:
-            store["error"] = video_info["error"]
-        else:
-            store["video_info"] = video_info
-            store["skipped"]    = skipped
-        store["done"] = True
+
+        try:
+            video_info, skipped = fetch_video_info(url, progress_callback=progress_callback)
+
+            if "error" in video_info:
+                store["error"] = video_info["error"]
+            else:
+                store["video_info"] = video_info
+                store["skipped"]    = skipped
+        except Exception as ex:
+            store["error"] = f"Failed to fetch video info: {ex}"
+        finally:
+            # Always mark the job as done so the client never gets stuck polling.
+            store["done"] = True
 
     threading.Thread(target=run_fetch).start()
     return {"job_id": job_id}

@@ -23,7 +23,7 @@ app = Flask(
     static_url_path="/static"
 )
 
-app.secret_key = "supersecret"
+app.secret_key = os.environ.get("SECRET_KEY", "dev-only-secret-key-change-me")
 
 # In-memory job stores keyed by job_id
 fetch_progress_store    = {}

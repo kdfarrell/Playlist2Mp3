@@ -8,3 +8,8 @@ downloads/*
 
 # Ignore virtual environment
 venv/
+.venv/
+
+# Ignore local secrets/env files
+.env
+.env.*

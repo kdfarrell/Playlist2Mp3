@@ -38,9 +38,19 @@ def youtube_cookies_file():
     if cookies_file_path:
         path = Path(cookies_file_path)
         if path.exists():
-            logger.info("YouTube cookies source=FILE path_exists=True")
-            yield str(path)
-            return
+            tmp_path = None
+            try:
+                with tempfile.NamedTemporaryFile(
+                    delete=False, suffix=".txt", mode="w", encoding="utf-8"
+                ) as tmp:
+                    tmp.write(path.read_text(encoding="utf-8"))
+                    tmp_path = tmp.name
+                logger.info("YouTube cookies source=FILE path_exists=True")
+                yield tmp_path
+                return
+            finally:
+                if tmp_path and os.path.exists(tmp_path):
+                    os.unlink(tmp_path)
         logger.warning("YouTube cookies source=FILE path_exists=False")
 
     cookies_content = None

@@ -5,6 +5,8 @@ import shutil
 import uuid
 import tempfile
 import time
+import base64
+import binascii
 from pathlib import Path
 from contextlib import contextmanager
 
@@ -29,8 +31,26 @@ def resolve_ffmpeg_location():
 
 @contextmanager
 def youtube_cookies_file():
-    """Create a temporary cookies file from YOUTUBE_COOKIES env var if present."""
-    cookies_content = os.environ.get("YOUTUBE_COOKIES")
+    """Create a temporary cookies file from env vars if present."""
+    cookies_file_path = os.environ.get("YOUTUBE_COOKIES_FILE")
+    if cookies_file_path:
+        path = Path(cookies_file_path)
+        if path.exists():
+            yield str(path)
+            return
+
+    cookies_content = None
+
+    cookies_b64 = os.environ.get("YOUTUBE_COOKIES_B64")
+    if cookies_b64:
+        try:
+            cookies_content = base64.b64decode(cookies_b64).decode("utf-8")
+        except (binascii.Error, UnicodeDecodeError):
+            cookies_content = None
+
+    if not cookies_content:
+        cookies_content = os.environ.get("YOUTUBE_COOKIES")
+
     if not cookies_content:
         yield None
         return

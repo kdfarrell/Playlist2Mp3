@@ -31,6 +31,19 @@ def resolve_ffmpeg_location():
     return "ffmpeg"
 
 
+def yt_dlp_js_options():
+    """Build yt-dlp JS runtime/EJS options from env vars."""
+    js_runtimes = os.environ.get("YT_DLP_JS_RUNTIMES", "node")
+    remote_components = os.environ.get("YT_DLP_REMOTE_COMPONENTS", "ejs:github")
+
+    opts = {}
+    if js_runtimes.strip():
+        opts["js_runtimes"] = [s.strip() for s in js_runtimes.split(",") if s.strip()]
+    if remote_components.strip():
+        opts["remote_components"] = [s.strip() for s in remote_components.split(",") if s.strip()]
+    return opts
+
+
 @contextmanager
 def youtube_cookies_file():
     """Create a temporary cookies file from env vars if present."""
@@ -111,6 +124,7 @@ def fetch_video_info(video_url, progress_callback=None):
             "no_warnings":   True,
             "logger":        SilentLogger()
         }
+        flat_opts.update(yt_dlp_js_options())
         if cookies_path:
             flat_opts["cookiefile"] = cookies_path
 
@@ -146,6 +160,7 @@ def fetch_video_info(video_url, progress_callback=None):
                 "no_warnings":   True,
                 "logger":        SilentLogger()
             }
+            full_opts.update(yt_dlp_js_options())
             if cookies_path:
                 full_opts["cookiefile"] = cookies_path
 
@@ -238,6 +253,7 @@ def fetch_video_info(video_url, progress_callback=None):
             "no_warnings":   True,
             "logger":        SilentLogger()
         }
+        full_opts.update(yt_dlp_js_options())
         if cookies_path:
             full_opts["cookiefile"] = cookies_path
 
@@ -322,6 +338,7 @@ def download_audio(video_urls, video_type, total_videos=1, progress_callback=Non
             "quiet":          True,
             "progress_hooks": [ydl_progress_hook],
         }
+        ydl_opts.update(yt_dlp_js_options())
         if cookies_path:
             ydl_opts["cookiefile"] = cookies_path
 

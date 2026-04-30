@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: playlist2mp3
+    runtime: docker
+    plan: free
+    autoDeploy: true

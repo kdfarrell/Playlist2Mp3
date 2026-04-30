@@ -203,9 +203,10 @@
         e.preventDefault();
 
         const url = document.getElementById("urlInput").value.trim();
+        if (!url) return;
 
-        // Clear input and any previously rendered results immediately
-        document.getElementById("urlInput").value = "";
+        // Hide the form immediately to prevent repeated URL submissions
+        hideForm();
         document.querySelector(".video-container")?.remove();
 
         convertBtn.classList.add("loading");
@@ -223,6 +224,7 @@
             toast(err.message, "error");
             resetConvertBtn();
             hideProgress();
+            restoreForm();
             return;
         }
 

@@ -13,6 +13,19 @@ FFMPEG_PATH  = PROJECT_ROOT / "ffmpeg" / "ffmpeg.exe"
 TEMP_DIR     = Path(tempfile.gettempdir()) / "playlist2mp3"
 
 
+def resolve_ffmpeg_location():
+    """Use bundled ffmpeg on Windows, otherwise fallback to env/PATH."""
+    env_ffmpeg_path = os.environ.get("FFMPEG_PATH")
+    if env_ffmpeg_path:
+        return env_ffmpeg_path
+
+    if FFMPEG_PATH.exists():
+        return str(FFMPEG_PATH)
+
+    # On Linux hosts (Render), rely on system ffmpeg installed in PATH.
+    return "ffmpeg"
+
+
 # ---------------- FETCH VIDEO / PLAYLIST INFO ---------------- #
 
 def fetch_video_info(video_url, progress_callback=None):
@@ -213,7 +226,7 @@ def download_audio(video_urls, video_type, total_videos=1, progress_callback=Non
     ydl_opts = {
         "format":  "bestaudio/best",
         "outtmpl": str(download_path / "%(title)s.%(ext)s"),
-        "ffmpeg_location": str(FFMPEG_PATH),
+        "ffmpeg_location": resolve_ffmpeg_location(),
         "postprocessors": [{
             "key":              "FFmpegExtractAudio",
             "preferredcodec":   "mp3",

@@ -50,11 +50,11 @@ function showProgressIndeterminate(label) {
 
 // ----- HIDE PROGRESS BAR -----
 
-function hideProgress() {
+function hideProgress(immediate = false) {
     const e = els();
     if (!e.wrap) return;
 
-    setTimeout(() => {
+    const reset = () => {
         e.wrap.style.display = "none";
         e.bar.classList.remove("progress-bar--indeterminate");
         e.bar.style.width    = "0%";
@@ -63,7 +63,14 @@ function hideProgress() {
             e.counter.textContent   = "";
             e.counter.style.display = "none";
         }
-    }, 700);
+    };
+
+    if (immediate) {
+        reset();
+        return;
+    }
+
+    setTimeout(reset, 700);
 }
 
 
@@ -100,9 +107,8 @@ function startDownloadProgressBar(jobId, onComplete, onError) {
 
             if (data.done) {
                 clearInterval(interval);
-                showProgress("Complete!", null, 100);
+                hideProgress(true);
                 if (onComplete) onComplete(data.skipped_count || 0);
-                setTimeout(() => hideProgress(), 1000);
             }
 
         } catch (err) {

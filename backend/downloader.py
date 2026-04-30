@@ -107,8 +107,10 @@ def fetch_video_info(video_url, progress_callback=None):
         try:
             with YoutubeDL(flat_opts) as ydl:
                 flat_info = ydl.extract_info(video_url, download=False)
-        except Exception:
-            return {"error": "Failed to extract video information"}, []
+        except Exception as ex:
+            logger.exception("Flat metadata extraction failed for url=%s", video_url)
+            message = str(ex).strip() or ex.__class__.__name__
+            return {"error": f"Failed to extract video information: {message}"}, []
 
         if not flat_info:
             return {"error": "No video information found"}, []

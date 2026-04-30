@@ -9,12 +9,23 @@ import zipfile
 import shutil
 import threading
 import uuid
+import sys
+import logging
 
 
 # ----- APP SETUP -----
 
 BASE_DIR     = os.path.dirname(__file__)
 FRONTEND_DIR = os.path.join(BASE_DIR, "..", "frontend")
+
+log_level_name = os.environ.get("LOG_LEVEL", "INFO").upper()
+log_level = getattr(logging, log_level_name, logging.INFO)
+logging.basicConfig(
+    level=log_level,
+    format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+    stream=sys.stdout,
+    force=True,
+)
 
 app = Flask(
     __name__,
@@ -24,6 +35,7 @@ app = Flask(
 )
 
 app.secret_key = os.environ.get("SECRET_KEY", "dev-only-secret-key-change-me")
+app.logger.setLevel(log_level)
 
 # In-memory job stores keyed by job_id
 fetch_progress_store    = {}

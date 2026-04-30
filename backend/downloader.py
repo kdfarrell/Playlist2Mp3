@@ -6,6 +6,7 @@ import uuid
 import tempfile
 import time
 from pathlib import Path
+from contextlib import contextmanager
 
 
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -26,41 +27,157 @@ def resolve_ffmpeg_location():
     return "ffmpeg"
 
 
+@contextmanager
+def youtube_cookies_file():
+    """Create a temporary cookies file from YOUTUBE_COOKIES env var if present."""
+    cookies_content = os.environ.get("YOUTUBE_COOKIES")
+    if not cookies_content:
+        yield None
+        return
+
+    tmp_path = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            delete=False, suffix=".txt", mode="w", encoding="utf-8"
+        ) as tmp:
+            tmp.write(cookies_content)
+            tmp_path = tmp.name
+        yield tmp_path
+    finally:
+        if tmp_path and os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+
+
 # ---------------- FETCH VIDEO / PLAYLIST INFO ---------------- #
 
 def fetch_video_info(video_url, progress_callback=None):
-    # Do a fast flat extraction first to check if this is a video or playlist
-    flat_opts = {
-        "quiet":         True,
-        "skip_download": True,
-        "ignoreerrors":  True,
-        "noplaylist":    False,
-        "extract_flat":  True,
-        "no_warnings":   True,
-        "logger":        SilentLogger()
-    }
+    with youtube_cookies_file() as cookies_path:
+        # Do a fast flat extraction first to check if this is a video or playlist
+        flat_opts = {
+            "quiet":         True,
+            "skip_download": True,
+            "ignoreerrors":  True,
+            "noplaylist":    False,
+            "extract_flat":  True,
+            "no_warnings":   True,
+            "logger":        SilentLogger()
+        }
+        if cookies_path:
+            flat_opts["cookiefile"] = cookies_path
 
-    try:
-        with YoutubeDL(flat_opts) as ydl:
-            flat_info = ydl.extract_info(video_url, download=False)
-    except Exception:
-        return {"error": "Failed to extract video information"}, []
+        try:
+            with YoutubeDL(flat_opts) as ydl:
+                flat_info = ydl.extract_info(video_url, download=False)
+        except Exception:
+            return {"error": "Failed to extract video information"}, []
 
-    if not flat_info:
-        return {"error": "No video information found"}, []
+        if not flat_info:
+            return {"error": "No video information found"}, []
 
-    entries = flat_info.get("entries")
+        entries = flat_info.get("entries")
 
 
     # ---------------- PLAYLIST ---------------- #
 
-    if entries:
-        all_entries = [e for e in entries if e]
-        total       = len(all_entries)
-        videos      = []
-        skipped     = []
+        if entries:
+            all_entries = [e for e in entries if e]
+            total       = len(all_entries)
+            videos      = []
+            skipped     = []
 
-        # Full extraction options used per individual video
+            # Full extraction options used per individual video
+            full_opts = {
+                "quiet":         True,
+                "skip_download": True,
+                "ignoreerrors":  True,
+                "noplaylist":    True,
+                "extract_flat":  False,
+                "no_warnings":   True,
+                "logger":        SilentLogger()
+            }
+            if cookies_path:
+                full_opts["cookiefile"] = cookies_path
+
+            for i, entry in enumerate(all_entries):
+                entry_url = entry.get("url") or entry.get("webpage_url")
+
+                # Skip entries with no resolvable URL
+                if not entry_url:
+                    skipped.append(entry.get("title") or f"Video {i+1}")
+                    if progress_callback:
+                        progress_callback({
+                            "status":  "fetch_progress",
+                            "current": i + 1,
+                            "total":   total,
+                            "title":   entry.get("title") or f"Video {i+1}",
+                            "skipped": True
+                        })
+                    continue
+
+                # Flat extraction sometimes returns bare video IDs instead of full URLs
+                if not entry_url.startswith("http"):
+                    entry_url = "https://www.youtube.com/watch?v=" + entry_url
+
+                if progress_callback:
+                    progress_callback({
+                        "status":  "fetch_progress",
+                        "current": i + 1,
+                        "total":   total,
+                        "title":   entry.get("title") or f"Video {i+1}",
+                        "skipped": False
+                    })
+
+                # Fetch full metadata for this video
+                try:
+                    with YoutubeDL(full_opts) as ydl:
+                        info = ydl.extract_info(entry_url, download=False)
+                except Exception:
+                    info = None
+
+                # Skip videos that are private, deleted, or otherwise unavailable
+                if not info or info.get("availability") not in (None, "public", ""):
+                    skipped.append(entry.get("title") or f"Video {i+1}")
+                    if progress_callback:
+                        progress_callback({
+                            "status":  "fetch_progress",
+                            "current": i + 1,
+                            "total":   total,
+                            "title":   entry.get("title") or f"Video {i+1}",
+                            "skipped": True
+                        })
+                    continue
+
+                videos.append({
+                    "url":      info.get("webpage_url") or entry_url,
+                    "title":    info.get("title") or entry.get("title"),
+                    "duration": format_duration(info.get("duration")),
+                    "uploader": info.get("uploader") or info.get("channel")
+                })
+
+            if progress_callback:
+                progress_callback({"status": "fetch_done"})
+
+            return {
+                "type":   "playlist",
+                "title":  flat_info.get("title"),
+                "url":    flat_info.get("webpage_url") or video_url,
+                "videos": videos,
+                "count":  len(videos)
+            }, skipped
+
+
+    # ---------------- SINGLE VIDEO ---------------- #
+
+        if progress_callback:
+            progress_callback({
+                "status":  "fetch_progress",
+                "current": 1,
+                "total":   1,
+                "title":   flat_info.get("title") or "Video",
+                "skipped": False
+            })
+
+    # Re-fetch with full metadata now that we know it is a single video
         full_opts = {
             "quiet":         True,
             "skip_download": True,
@@ -70,119 +187,31 @@ def fetch_video_info(video_url, progress_callback=None):
             "no_warnings":   True,
             "logger":        SilentLogger()
         }
+        if cookies_path:
+            full_opts["cookiefile"] = cookies_path
 
-        for i, entry in enumerate(all_entries):
-            entry_url = entry.get("url") or entry.get("webpage_url")
-
-            # Skip entries with no resolvable URL
-            if not entry_url:
-                skipped.append(entry.get("title") or f"Video {i+1}")
-                if progress_callback:
-                    progress_callback({
-                        "status":  "fetch_progress",
-                        "current": i + 1,
-                        "total":   total,
-                        "title":   entry.get("title") or f"Video {i+1}",
-                        "skipped": True
-                    })
-                continue
-
-            # Flat extraction sometimes returns bare video IDs instead of full URLs
-            if not entry_url.startswith("http"):
-                entry_url = "https://www.youtube.com/watch?v=" + entry_url
-
-            if progress_callback:
-                progress_callback({
-                    "status":  "fetch_progress",
-                    "current": i + 1,
-                    "total":   total,
-                    "title":   entry.get("title") or f"Video {i+1}",
-                    "skipped": False
-                })
-
-            # Fetch full metadata for this video
-            try:
-                with YoutubeDL(full_opts) as ydl:
-                    info = ydl.extract_info(entry_url, download=False)
-            except Exception:
-                info = None
-
-            # Skip videos that are private, deleted, or otherwise unavailable
-            if not info or info.get("availability") not in (None, "public", ""):
-                skipped.append(entry.get("title") or f"Video {i+1}")
-                if progress_callback:
-                    progress_callback({
-                        "status":  "fetch_progress",
-                        "current": i + 1,
-                        "total":   total,
-                        "title":   entry.get("title") or f"Video {i+1}",
-                        "skipped": True
-                    })
-                continue
-
-            videos.append({
-                "url":      info.get("webpage_url") or entry_url,
-                "title":    info.get("title") or entry.get("title"),
-                "duration": format_duration(info.get("duration")),
-                "uploader": info.get("uploader") or info.get("channel")
-            })
+        try:
+            with YoutubeDL(full_opts) as ydl:
+                info = ydl.extract_info(video_url, download=False)
+        except Exception:
+            info = None
 
         if progress_callback:
             progress_callback({"status": "fetch_done"})
 
+        if not info:
+            return {"error": "No video information found"}, []
+
+        if info.get("availability") not in (None, "public", ""):
+            return {"error": "Video is private, unlisted, or unavailable"}, []
+
         return {
-            "type":   "playlist",
-            "title":  flat_info.get("title"),
-            "url":    flat_info.get("webpage_url") or video_url,
-            "videos": videos,
-            "count":  len(videos)
-        }, skipped
-
-
-    # ---------------- SINGLE VIDEO ---------------- #
-
-    if progress_callback:
-        progress_callback({
-            "status":  "fetch_progress",
-            "current": 1,
-            "total":   1,
-            "title":   flat_info.get("title") or "Video",
-            "skipped": False
-        })
-
-    # Re-fetch with full metadata now that we know it is a single video
-    full_opts = {
-        "quiet":         True,
-        "skip_download": True,
-        "ignoreerrors":  True,
-        "noplaylist":    True,
-        "extract_flat":  False,
-        "no_warnings":   True,
-        "logger":        SilentLogger()
-    }
-
-    try:
-        with YoutubeDL(full_opts) as ydl:
-            info = ydl.extract_info(video_url, download=False)
-    except Exception:
-        info = None
-
-    if progress_callback:
-        progress_callback({"status": "fetch_done"})
-
-    if not info:
-        return {"error": "No video information found"}, []
-
-    if info.get("availability") not in (None, "public", ""):
-        return {"error": "Video is private, unlisted, or unavailable"}, []
-
-    return {
-        "type":     "video",
-        "url":      info.get("webpage_url") or video_url,
-        "title":    info.get("title"),
-        "duration": format_duration(info.get("duration")),
-        "uploader": info.get("uploader") or info.get("channel")
-    }, []
+            "type":     "video",
+            "url":      info.get("webpage_url") or video_url,
+            "title":    info.get("title"),
+            "duration": format_duration(info.get("duration")),
+            "uploader": info.get("uploader") or info.get("channel")
+        }, []
 
 
 # ---------------- DOWNLOAD AUDIO ---------------- #
@@ -223,34 +252,37 @@ def download_audio(video_urls, video_type, total_videos=1, progress_callback=Non
                 "total":   total_videos
             })
 
-    ydl_opts = {
-        "format":  "bestaudio/best",
-        "outtmpl": str(download_path / "%(title)s.%(ext)s"),
-        "ffmpeg_location": resolve_ffmpeg_location(),
-        "postprocessors": [{
-            "key":              "FFmpegExtractAudio",
-            "preferredcodec":   "mp3",
-            "preferredquality": "320"
-        }],
-        "concurrent_fragment_downloads": 4,
-        "skip_unavailable_fragments":    True,
-        "ignoreerrors":   True,
-        "logger":         SilentLogger(),
-        "no_warnings":    True,
-        "noplaylist":     True,   # each call receives exactly one video URL
-        "quiet":          True,
-        "progress_hooks": [ydl_progress_hook],
-    }
+    with youtube_cookies_file() as cookies_path:
+        ydl_opts = {
+            "format":  "bestaudio/best",
+            "outtmpl": str(download_path / "%(title)s.%(ext)s"),
+            "ffmpeg_location": resolve_ffmpeg_location(),
+            "postprocessors": [{
+                "key":              "FFmpegExtractAudio",
+                "preferredcodec":   "mp3",
+                "preferredquality": "320"
+            }],
+            "concurrent_fragment_downloads": 4,
+            "skip_unavailable_fragments":    True,
+            "ignoreerrors":   True,
+            "logger":         SilentLogger(),
+            "no_warnings":    True,
+            "noplaylist":     True,   # each call receives exactly one video URL
+            "quiet":          True,
+            "progress_hooks": [ydl_progress_hook],
+        }
+        if cookies_path:
+            ydl_opts["cookiefile"] = cookies_path
 
-    last_info = None
-    with YoutubeDL(ydl_opts) as ydl:
-        for url in video_urls:
-            try:
-                info = ydl.extract_info(url, download=True)
-                if info:
-                    last_info = info
-            except Exception:
-                pass  # ignoreerrors handles failures; this is belt-and-suspenders
+        last_info = None
+        with YoutubeDL(ydl_opts) as ydl:
+            for url in video_urls:
+                try:
+                    info = ydl.extract_info(url, download=True)
+                    if info:
+                        last_info = info
+                except Exception:
+                    pass  # ignoreerrors handles failures; this is belt-and-suspenders
 
     if progress_callback:
         progress_callback({"status": "done"})

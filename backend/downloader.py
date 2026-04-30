@@ -33,15 +33,9 @@ def resolve_ffmpeg_location():
 
 def yt_dlp_js_options():
     """Build yt-dlp JS runtime/EJS options from env vars."""
-    js_runtimes = os.environ.get("YT_DLP_JS_RUNTIMES", "node")
-    remote_components = os.environ.get("YT_DLP_REMOTE_COMPONENTS", "ejs:github")
-
-    opts = {}
-    if js_runtimes.strip():
-        opts["js_runtimes"] = [s.strip() for s in js_runtimes.split(",") if s.strip()]
-    if remote_components.strip():
-        opts["remote_components"] = [s.strip() for s in remote_components.split(",") if s.strip()]
-    return opts
+    return {
+        "js_runtimes": {"node": {}},
+    }
 
 
 @contextmanager

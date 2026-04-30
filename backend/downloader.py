@@ -7,6 +7,7 @@ import tempfile
 import time
 import base64
 import binascii
+import logging
 from pathlib import Path
 from contextlib import contextmanager
 
@@ -14,6 +15,7 @@ from contextlib import contextmanager
 PROJECT_ROOT = Path(__file__).parent.parent
 FFMPEG_PATH  = PROJECT_ROOT / "ffmpeg" / "ffmpeg.exe"
 TEMP_DIR     = Path(tempfile.gettempdir()) / "playlist2mp3"
+logger       = logging.getLogger(__name__)
 
 
 def resolve_ffmpeg_location():
@@ -36,24 +38,40 @@ def youtube_cookies_file():
     if cookies_file_path:
         path = Path(cookies_file_path)
         if path.exists():
+            logger.info("YouTube cookies source=FILE path_exists=True")
             yield str(path)
             return
+        logger.warning("YouTube cookies source=FILE path_exists=False")
 
     cookies_content = None
+    source = "NONE"
 
     cookies_b64 = os.environ.get("YOUTUBE_COOKIES_B64")
     if cookies_b64:
         try:
             cookies_content = base64.b64decode(cookies_b64).decode("utf-8")
+            source = "B64"
         except (binascii.Error, UnicodeDecodeError):
+            logger.warning("YouTube cookies source=B64 decode_failed=True")
             cookies_content = None
 
     if not cookies_content:
         cookies_content = os.environ.get("YOUTUBE_COOKIES")
+        if cookies_content:
+            source = "RAW"
 
     if not cookies_content:
+        logger.warning("YouTube cookies source=NONE cookies_loaded=False")
         yield None
         return
+
+    contains_youtube = ".youtube.com" in cookies_content or "youtube.com" in cookies_content
+    logger.info(
+        "YouTube cookies source=%s cookies_len=%d contains_youtube_domain=%s",
+        source,
+        len(cookies_content),
+        contains_youtube,
+    )
 
     tmp_path = None
     try:
@@ -62,6 +80,7 @@ def youtube_cookies_file():
         ) as tmp:
             tmp.write(cookies_content)
             tmp_path = tmp.name
+        logger.info("YouTube cookies temp_file_created=True")
         yield tmp_path
     finally:
         if tmp_path and os.path.exists(tmp_path):
